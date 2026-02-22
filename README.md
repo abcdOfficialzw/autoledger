@@ -1,17 +1,50 @@
 # motoledger
 
-A new Flutter project.
+Auto Ledger MVP Phase 1 built with Flutter, `flutter_bloc`, and Isar (offline-first).
 
-## Getting Started
+## Current state
 
-This project is a starting point for a Flutter application.
+- Vehicle management: create, edit, delete
+- Quick add expense: select vehicle, amount, category, date, optional details
+- Bottom navigation shell wired to real local persistence for Vehicles and Add Expense
+- Reports/Settings remain placeholder pages for next phase
 
-A few resources to get you started if this is your first Flutter project:
+## Tech stack
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Flutter + Material 3
+- `flutter_bloc` for feature state
+- `go_router` for app routing
+- Isar for local DB
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Run locally
+
+1. Install dependencies:
+```bash
+flutter pub get
+```
+
+2. Generate Isar files:
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+3. Run app:
+```bash
+flutter run
+```
+
+## Quality checks
+
+Run static analysis and tests:
+
+```bash
+flutter analyze
+flutter test
+```
+
+## Build examples
+
+```bash
+flutter build apk
+flutter build ios
+```

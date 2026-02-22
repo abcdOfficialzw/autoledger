@@ -1,28 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:isar/isar.dart';
 
+import 'core/database/local_database.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/expenses/data/isar_expense_repository.dart';
+import 'features/expenses/domain/expense_repository.dart';
+import 'features/expenses/presentation/cubit/add_expense_cubit.dart';
 import 'features/shell/presentation/navigation_cubit.dart';
+import 'features/vehicles/data/isar_vehicle_repository.dart';
+import 'features/vehicles/domain/vehicle_repository.dart';
+import 'features/vehicles/presentation/cubit/vehicle_cubit.dart';
 
-void main() {
-  runApp(const AutoLedgerApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final isar = await LocalDatabase.open();
+  runApp(AutoLedgerApp(isar: isar));
 }
 
 class AutoLedgerApp extends StatelessWidget {
-  const AutoLedgerApp({super.key});
+  const AutoLedgerApp({
+    this.isar,
+    this.vehicleRepository,
+    this.expenseRepository,
+    super.key,
+  }) : assert(
+          isar != null || (vehicleRepository != null && expenseRepository != null),
+          'Provide either isar or explicit repositories.',
+        );
+
+  final Isar? isar;
+  final VehicleRepository? vehicleRepository;
+  final ExpenseRepository? expenseRepository;
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    final resolvedVehicleRepository = vehicleRepository ?? IsarVehicleRepository(isar!);
+    final resolvedExpenseRepository = expenseRepository ?? IsarExpenseRepository(isar!);
+
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider(create: (_) => NavigationCubit()),
+        RepositoryProvider<VehicleRepository>(
+          create: (_) => resolvedVehicleRepository,
+        ),
+        RepositoryProvider<ExpenseRepository>(
+          create: (_) => resolvedExpenseRepository,
+        ),
       ],
-      child: MaterialApp.router(
-        title: 'Auto Ledger',
-        theme: AppTheme.light,
-        debugShowCheckedModeBanner: false,
-        routerConfig: appRouter,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => NavigationCubit()),
+          BlocProvider(
+            create: (context) => VehicleCubit(context.read<VehicleRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => AddExpenseCubit(
+              context.read<ExpenseRepository>(),
+              context.read<VehicleRepository>(),
+            ),
+          ),
+        ],
+        child: MaterialApp.router(
+          title: 'Auto Ledger',
+          theme: AppTheme.light,
+          debugShowCheckedModeBanner: false,
+          routerConfig: appRouter,
+        ),
       ),
     );
   }
