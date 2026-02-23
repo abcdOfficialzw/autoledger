@@ -26,7 +26,7 @@ class HomeShell extends StatelessWidget {
           extendBody: true,
           body: SafeArea(child: _pages[index]),
           bottomNavigationBar: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
             child: Row(
               children: [
                 Expanded(
@@ -74,13 +74,13 @@ class _FloatingNavBar extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.94),
-        borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: const Color(0x22000000), width: 1.4),
+        color: Colors.white.withValues(alpha: 0.97),
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: const Color(0x1A000000), width: 1.2),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 20,
+            color: Color(0x19000000),
+            blurRadius: 18,
             offset: Offset(0, 8),
           ),
         ],
@@ -88,23 +88,24 @@ class _FloatingNavBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Row(
             children: List.generate(_items.length, (index) {
               final item = _items[index];
               final isSelected = selectedIndex == index;
               return Expanded(
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(22),
                   onTap: () => onTap(index),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(22),
                       color: isSelected
-                          ? const Color(0xFFDDE0E5)
+                          ? const Color(0xFFE7E8ED)
                           : Colors.transparent,
                     ),
                     child: Column(
@@ -112,7 +113,7 @@ class _FloatingNavBar extends StatelessWidget {
                       children: [
                         Icon(
                           item.$1,
-                          size: 22,
+                          size: 21,
                           color: isSelected
                               ? colorScheme.primary
                               : const Color(0xFF111111),
@@ -155,14 +156,14 @@ class _AddFab extends StatelessWidget {
     return Material(
       color: Colors.white,
       shape: const CircleBorder(),
-      elevation: 8,
+      elevation: 10,
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onPressed,
         child: const SizedBox(
-          width: 64,
-          height: 64,
-          child: Icon(Icons.add, size: 30),
+          width: 66,
+          height: 66,
+          child: Icon(Icons.add, size: 31),
         ),
       ),
     );

@@ -49,3 +49,4 @@
 - [x] Validate vehicles redesign with tests and push to main.
 - [x] Bottom nav style update: match Telegram-like capsule with selected tab pill emphasis.
 - [x] Nav restructure: Home, Vehicles, Reports, Settings in capsule + detached Add button opening Add Expense page.
+- [x] Bottom nav visual tune: match provided mock spacing, pill proportions, and detached add button balance.
