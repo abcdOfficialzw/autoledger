@@ -11,10 +11,10 @@
 - [x] Add backup/restore guidance screen.
 - [x] Add reset confirmation flow (safe + explicit).
 - [x] Add tests for settings action triggers.
-- [ ] Add custom date range picker UX in Reports.
-- [ ] Improve chart legends + empty/fallback states.
-- [ ] Add summary chips (top cost category, monthly delta).
-- [ ] Add tests for report filter and summary logic.
+- [x] Add custom date range picker UX in Reports.
+- [x] Improve chart legends + empty/fallback states.
+- [x] Add summary chips (top cost category, monthly delta).
+- [x] Add tests for report filter and summary logic.
 - [ ] Finalize app branding assets (icon/splash/title).
 - [ ] Confirm package/app naming strategy (keep `motoledger` internally or rename).
 - [ ] Build Android release APK/AAB sanity check.

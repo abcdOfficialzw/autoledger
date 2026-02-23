@@ -48,6 +48,37 @@ class MonthlySpend extends Equatable {
   List<Object> get props => [monthStart, total];
 }
 
+class MonthlyDeltaSummary extends Equatable {
+  const MonthlyDeltaSummary({
+    required this.previousMonth,
+    required this.currentMonth,
+    required this.previousTotal,
+    required this.currentTotal,
+    required this.amount,
+    required this.changeRatio,
+  });
+
+  final DateTime previousMonth;
+  final DateTime currentMonth;
+  final double previousTotal;
+  final double currentTotal;
+  final double amount;
+  final double? changeRatio;
+
+  bool get isIncrease => amount > 0;
+  bool get isDecrease => amount < 0;
+
+  @override
+  List<Object?> get props => [
+    previousMonth,
+    currentMonth,
+    previousTotal,
+    currentTotal,
+    amount,
+    changeRatio,
+  ];
+}
+
 class ReportsState extends Equatable {
   const ReportsState({
     this.status = ReportsStatus.initial,
@@ -92,6 +123,28 @@ class ReportsState extends Equatable {
   final int licenseReminderUpcomingCount;
   final int licenseReminderOverdueCount;
   final String? errorMessage;
+
+  CategorySpend? get topCostCategory =>
+      categoryBreakdown.isEmpty ? null : categoryBreakdown.first;
+
+  MonthlyDeltaSummary? get monthlyDeltaSummary {
+    if (monthlyTrend.length < 2) {
+      return null;
+    }
+
+    final previous = monthlyTrend[monthlyTrend.length - 2];
+    final current = monthlyTrend.last;
+    final delta = current.total - previous.total;
+
+    return MonthlyDeltaSummary(
+      previousMonth: previous.monthStart,
+      currentMonth: current.monthStart,
+      previousTotal: previous.total,
+      currentTotal: current.total,
+      amount: delta,
+      changeRatio: previous.total == 0 ? null : delta / previous.total,
+    );
+  }
 
   ReportsState copyWith({
     ReportsStatus? status,

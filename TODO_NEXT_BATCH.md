@@ -18,10 +18,10 @@ Move from feature-complete MVP core to release-ready MVP with better usability a
 - [x] Add tests for settings action triggers.
 
 ## C) Reports & Insights Polish
-- [ ] Add custom date range picker UX in Reports.
-- [ ] Improve chart legends + empty/fallback states.
-- [ ] Add summary chips (top cost category, monthly delta).
-- [ ] Add tests for report filter and summary logic.
+- [x] Add custom date range picker UX in Reports.
+- [x] Improve chart legends + empty/fallback states.
+- [x] Add summary chips (top cost category, monthly delta).
+- [x] Add tests for report filter and summary logic.
 
 ## D) Release Readiness (Android-first)
 - [ ] Finalize app branding assets (icon/splash/title).
