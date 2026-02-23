@@ -9,7 +9,9 @@ import 'package:motoledger/features/vehicles/domain/vehicle_repository.dart';
 import 'package:motoledger/main.dart';
 
 void main() {
-  testWidgets('renders vehicles page', (WidgetTester tester) async {
+  testWidgets('renders dashboard first and navigates to settings', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       AutoLedgerApp(
         vehicleRepository: _FakeVehicleRepository(),
@@ -20,7 +22,8 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Add Vehicle'), findsWidgets);
+    expect(find.text('Dashboard'), findsWidgets);
+    expect(find.text('Go to vehicles'), findsOneWidget);
 
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
