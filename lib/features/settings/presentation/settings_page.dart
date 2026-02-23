@@ -201,8 +201,11 @@ class _ReminderSummaryCardState extends State<_ReminderSummaryCard> {
   }
 
   Future<ReminderSummary> _loadSummary() async {
-    final vehicles = await context.read<VehicleRepository>().getVehicles();
+    final vehicleRepository = context.read<VehicleRepository>();
     final expenseRepository = context.read<ExpenseRepository>();
+    final reminderService = context.read<ReminderComputationService>();
+
+    final vehicles = await vehicleRepository.getVehicles();
     final expenses = await Future.wait(
       vehicles.map(
         (vehicle) => expenseRepository.getExpensesForVehicle(vehicle.id),
@@ -213,7 +216,7 @@ class _ReminderSummaryCardState extends State<_ReminderSummaryCard> {
         vehicles[index].id: expenses[index],
     };
 
-    return context.read<ReminderComputationService>().summarize(
+    return reminderService.summarize(
       vehicles: vehicles,
       expensesByVehicle: expensesByVehicle,
       preferences: widget.preferences,
