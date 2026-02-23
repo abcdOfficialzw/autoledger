@@ -237,49 +237,54 @@ class _MetricsPanel extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final maxWidth = constraints.maxWidth;
-              final tileWidth = maxWidth >= 720
-                  ? (maxWidth - 20) / 3
+              final crossAxisCount = maxWidth >= 720
+                  ? 3
                   : maxWidth >= 460
-                      ? (maxWidth - 10) / 2
-                      : maxWidth;
+                      ? 2
+                      : 1;
 
-              return Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _MetricTile(
-                    width: tileWidth,
-                    label: 'Vehicles',
-                    value: '$vehicleCount',
+              final metrics = [
+                ('Vehicles', '$vehicleCount'),
+                (
+                  'Fleet value',
+                  Formatters.currency(
+                    totalVehicleValue,
+                    currencyCode: currencyCode,
+                    currencySymbol: currencySymbol,
                   ),
-                  _MetricTile(
-                    width: tileWidth,
-                    label: 'Fleet value',
-                    value: Formatters.currency(
-                      totalVehicleValue,
-                      currencyCode: currencyCode,
-                      currencySymbol: currencySymbol,
-                    ),
+                ),
+                (
+                  'This month',
+                  Formatters.currency(
+                    monthExpenses,
+                    currencyCode: currencyCode,
+                    currencySymbol: currencySymbol,
                   ),
-                  _MetricTile(
-                    width: tileWidth,
-                    label: 'This month',
-                    value: Formatters.currency(
-                      monthExpenses,
-                      currencyCode: currencyCode,
-                      currencySymbol: currencySymbol,
-                    ),
+                ),
+                (
+                  'Lifetime spend',
+                  Formatters.currency(
+                    totalExpenses,
+                    currencyCode: currencyCode,
+                    currencySymbol: currencySymbol,
                   ),
-                  _MetricTile(
-                    width: tileWidth,
-                    label: 'Lifetime spend',
-                    value: Formatters.currency(
-                      totalExpenses,
-                      currencyCode: currencyCode,
-                      currencySymbol: currencySymbol,
-                    ),
-                  ),
-                ],
+                ),
+              ];
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: metrics.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: crossAxisCount == 1 ? 3.4 : 2.2,
+                ),
+                itemBuilder: (context, index) => _MetricTile(
+                  label: metrics[index].$1,
+                  value: metrics[index].$2,
+                ),
               );
             },
           ),
@@ -290,41 +295,33 @@ class _MetricsPanel extends StatelessWidget {
 }
 
 class _MetricTile extends StatelessWidget {
-  const _MetricTile({
-    required this.label,
-    required this.value,
-    required this.width,
-  });
+  const _MetricTile({required this.label, required this.value});
 
   final String label;
   final String value;
-  final double width;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white.withOpacity(0.64),
-          border: Border.all(color: Colors.white.withOpacity(0.7)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: Theme.of(context).textTheme.labelLarge),
-              const SizedBox(height: 6),
-              Text(
-                value,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withOpacity(0.64),
+        border: Border.all(color: Colors.white.withOpacity(0.7)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: Theme.of(context).textTheme.labelLarge),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
         ),
       ),
     );
