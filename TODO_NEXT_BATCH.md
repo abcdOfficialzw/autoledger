@@ -12,10 +12,10 @@ Move from feature-complete MVP core to release-ready MVP with better usability a
 - [ ] Add tests for reminder action flows.
 
 ## B) Settings Expansion (Control & Safety)
-- [ ] Add export/import entry points in Settings.
-- [ ] Add backup/restore guidance screen.
-- [ ] Add reset confirmation flow (safe + explicit).
-- [ ] Add tests for settings action triggers.
+- [x] Add export/import entry points in Settings.
+- [x] Add backup/restore guidance screen.
+- [x] Add reset confirmation flow (safe + explicit).
+- [x] Add tests for settings action triggers.
 
 ## C) Reports & Insights Polish
 - [ ] Add custom date range picker UX in Reports.

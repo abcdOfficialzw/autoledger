@@ -10,7 +10,13 @@ class SettingsCubit extends Cubit<SettingsState> {
   final SettingsRepository _settingsRepository;
 
   Future<void> loadPreferences() async {
-    emit(state.copyWith(status: SettingsStatus.loading, errorMessage: null));
+    emit(
+      state.copyWith(
+        status: SettingsStatus.loading,
+        errorMessage: null,
+        clearAction: true,
+      ),
+    );
     try {
       final preferences = await _settingsRepository.loadPreferences();
       emit(
@@ -18,6 +24,7 @@ class SettingsCubit extends Cubit<SettingsState> {
           status: SettingsStatus.ready,
           preferences: preferences,
           errorMessage: null,
+          clearAction: true,
         ),
       );
     } catch (_) {
@@ -25,6 +32,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         state.copyWith(
           status: SettingsStatus.failure,
           errorMessage: 'Failed to load settings.',
+          clearAction: true,
         ),
       );
     }
@@ -51,7 +59,33 @@ class SettingsCubit extends Cubit<SettingsState> {
     await _save(state.preferences.copyWith(licenseReminderEnabled: enabled));
   }
 
-  Future<void> _save(AppPreferences preferences) async {
+  void triggerExportEntryPoint() {
+    _emitAction(
+      action: SettingsAction.exportEntryPoint,
+      message: 'Export entry point selected.',
+    );
+  }
+
+  void triggerImportEntryPoint() {
+    _emitAction(
+      action: SettingsAction.importEntryPoint,
+      message: 'Import entry point selected.',
+    );
+  }
+
+  Future<void> resetPreferencesToDefaults() async {
+    await _save(
+      const AppPreferences(),
+      action: SettingsAction.resetCompleted,
+      actionMessage: 'Settings reset to defaults.',
+    );
+  }
+
+  Future<void> _save(
+    AppPreferences preferences, {
+    SettingsAction? action,
+    String? actionMessage,
+  }) async {
     try {
       await _settingsRepository.savePreferences(preferences);
       emit(
@@ -59,6 +93,11 @@ class SettingsCubit extends Cubit<SettingsState> {
           status: SettingsStatus.ready,
           preferences: preferences,
           errorMessage: null,
+          lastAction: action,
+          actionMessage: actionMessage,
+          actionVersion: action == null
+              ? state.actionVersion
+              : state.actionVersion + 1,
         ),
       );
     } catch (_) {
@@ -66,8 +105,19 @@ class SettingsCubit extends Cubit<SettingsState> {
         state.copyWith(
           status: SettingsStatus.failure,
           errorMessage: 'Failed to save settings.',
+          clearAction: true,
         ),
       );
     }
+  }
+
+  void _emitAction({required SettingsAction action, required String message}) {
+    emit(
+      state.copyWith(
+        lastAction: action,
+        actionMessage: message,
+        actionVersion: state.actionVersion + 1,
+      ),
+    );
   }
 }

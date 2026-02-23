@@ -7,6 +7,7 @@ import '../../reminders/domain/reminder_candidate.dart';
 import '../../reminders/domain/services/reminder_computation_service.dart';
 import '../../vehicles/domain/vehicle_repository.dart';
 import '../domain/app_preferences.dart';
+import 'backup_restore_guidance_page.dart';
 import 'cubit/settings_cubit.dart';
 import 'cubit/settings_state.dart';
 
@@ -16,12 +17,22 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SettingsCubit, SettingsState>(
+      listenWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.actionVersion != current.actionVersion,
       listener: (context, state) {
         if (state.status == SettingsStatus.failure &&
             state.errorMessage != null) {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+          return;
+        }
+
+        if (state.actionMessage != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.actionMessage!)));
         }
       },
       builder: (context, state) {
@@ -39,7 +50,7 @@ class SettingsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Control currency, distance units, and reminders.',
+                  'Control currency, units, reminders, and data safety actions.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -160,6 +171,73 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.upload_file),
+                        title: const Text('Export data'),
+                        subtitle: const Text(
+                          'Create a portable data package entry point.',
+                        ),
+                        onTap: () => context
+                            .read<SettingsCubit>()
+                            .triggerExportEntryPoint(),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.file_download_outlined),
+                        title: const Text('Import data'),
+                        subtitle: const Text(
+                          'Restore data from an external package entry point.',
+                        ),
+                        onTap: () => context
+                            .read<SettingsCubit>()
+                            .triggerImportEntryPoint(),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.health_and_safety_outlined),
+                        title: const Text('Backup & restore guidance'),
+                        subtitle: const Text(
+                          'Recommended workflow before export/import.',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const BackupRestoreGuidancePage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        key: const Key('settings-reset-tile'),
+                        leading: const Icon(Icons.warning_amber_rounded),
+                        title: const Text('Reset settings'),
+                        subtitle: const Text(
+                          'Revert app preferences to safe defaults.',
+                        ),
+                        textColor: Theme.of(context).colorScheme.error,
+                        iconColor: Theme.of(context).colorScheme.error,
+                        onTap: () async {
+                          final shouldReset = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => const _ResetSettingsDialog(),
+                          );
+
+                          if (shouldReset == true && context.mounted) {
+                            await context
+                                .read<SettingsCubit>()
+                                .resetPreferencesToDefaults();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
                 _ReminderSummaryCard(preferences: preferences),
                 if (state.status == SettingsStatus.loading) ...[
                   const SizedBox(height: 12),
@@ -273,6 +351,59 @@ class _ReminderSummaryCardState extends State<_ReminderSummaryCard> {
           },
         ),
       ),
+    );
+  }
+}
+
+class _ResetSettingsDialog extends StatefulWidget {
+  const _ResetSettingsDialog();
+
+  @override
+  State<_ResetSettingsDialog> createState() => _ResetSettingsDialogState();
+}
+
+class _ResetSettingsDialogState extends State<_ResetSettingsDialog> {
+  String _confirmationText = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final canReset = _confirmationText.trim() == 'RESET';
+
+    return AlertDialog(
+      title: const Text('Reset settings'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'This only resets settings preferences. Type RESET to continue.',
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('reset-confirm-input'),
+            textCapitalization: TextCapitalization.characters,
+            decoration: const InputDecoration(
+              labelText: 'Confirmation text',
+              hintText: 'RESET',
+            ),
+            onChanged: (value) {
+              setState(() {
+                _confirmationText = value;
+              });
+            },
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: canReset ? () => Navigator.of(context).pop(true) : null,
+          child: const Text('Reset now'),
+        ),
+      ],
     );
   }
 }
