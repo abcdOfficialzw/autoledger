@@ -50,6 +50,12 @@ flutter analyze
 flutter test
 ```
 
+Or run the CI-parity local script:
+
+```bash
+./scripts/check_local_ci.sh
+```
+
 ## Build examples
 
 ```bash
@@ -82,3 +88,7 @@ Until final branding binaries are available, the project keeps the currently che
   - [ ] `/home/titus/development/flutter/bin/flutter build appbundle --release`
 - [ ] Quick install sanity check:
   - [ ] Install release APK on a test device/emulator and verify launch/navigation.
+
+## Contribution notes
+
+Contribution workflow and TODO cadence guidance live in `CONTRIBUTING.md`.
