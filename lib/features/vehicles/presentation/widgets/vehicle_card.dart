@@ -26,6 +26,15 @@ class VehicleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final nickname = vehicle.nickname?.trim();
+    final currentKnownMileage = (vehicle.lastServiceMileage != null &&
+            vehicle.lastServiceMileage! > vehicle.initialMileage)
+        ? vehicle.lastServiceMileage!
+        : vehicle.initialMileage;
+    final accruedMileage = currentKnownMileage - vehicle.initialMileage;
+    final nextServiceDate =
+        vehicle.serviceReminderRescheduledDate ??
+        (vehicle.lastServiceDate?.add(const Duration(days: 180)));
+    final licenseRenewalDate = vehicle.licenseExpiryDate;
     final subtitle = nickname != null && nickname.isNotEmpty
         ? '${vehicle.make} ${vehicle.model} • ${vehicle.year}'
         : '${vehicle.year} • ${vehicle.registrationNumber}';
@@ -136,6 +145,30 @@ class VehicleCard extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              _InfoChip(
+                                icon: Icons.build_circle_outlined,
+                                label: nextServiceDate == null
+                                    ? 'Next service: N/A'
+                                    : 'Next service: ${Formatters.date(nextServiceDate)}',
+                              ),
+                              _InfoChip(
+                                icon: Icons.event_available_outlined,
+                                label: licenseRenewalDate == null
+                                    ? 'License renewal: N/A'
+                                    : 'License renewal: ${Formatters.date(licenseRenewalDate)}',
+                              ),
+                              _InfoChip(
+                                icon: Icons.speed_outlined,
+                                label:
+                                    'Accrued mileage: ${Formatters.number(distanceUnit.fromKilometers(accruedMileage))} ${distanceUnit.shortLabel}',
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -159,6 +192,35 @@ class VehicleCard extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13),
+            const SizedBox(width: 4),
+            Text(label, style: Theme.of(context).textTheme.labelSmall),
+          ],
         ),
       ),
     );
