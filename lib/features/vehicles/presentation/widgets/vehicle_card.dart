@@ -34,6 +34,16 @@ class VehicleCard extends StatelessWidget {
     final nextServiceDate =
         vehicle.serviceReminderRescheduledDate ??
         (vehicle.lastServiceDate?.add(const Duration(days: 180)));
+    final serviceBaseMileage =
+        vehicle.lastServiceMileage ?? vehicle.initialMileage;
+    final nextServiceMileage = vehicle.serviceIntervalKm == null
+        ? null
+        : serviceBaseMileage + vehicle.serviceIntervalKm!;
+    final nextServiceLabel = nextServiceDate != null
+        ? Formatters.date(nextServiceDate)
+        : nextServiceMileage != null
+            ? 'At ${Formatters.number(distanceUnit.fromKilometers(nextServiceMileage))} ${distanceUnit.shortLabel}'
+            : 'Not set';
     final licenseRenewalDate = vehicle.licenseExpiryDate;
     final subtitle = nickname != null && nickname.isNotEmpty
         ? '${vehicle.make} ${vehicle.model} • ${vehicle.year}'
@@ -161,9 +171,7 @@ class VehicleCard extends StatelessWidget {
                                     width: tileWidth,
                                     icon: Icons.build_circle_outlined,
                                     title: 'Next service',
-                                    value: nextServiceDate == null
-                                        ? 'Not set'
-                                        : Formatters.date(nextServiceDate),
+                                    value: nextServiceLabel,
                                   ),
                                   _InfoStatTile(
                                     width: tileWidth,
