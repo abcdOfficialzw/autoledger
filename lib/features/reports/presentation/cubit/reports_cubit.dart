@@ -97,6 +97,7 @@ class ReportsCubit extends Cubit<ReportsState> {
 
       final categoryTotals = <ExpenseCategory, double>{};
       final monthlyTotals = <DateTime, double>{};
+      final vehicleTotals = <int, double>{};
       var totalExpenses = 0.0;
       var totalPurchase = 0.0;
 
@@ -108,6 +109,11 @@ class ReportsCubit extends Cubit<ReportsState> {
 
         for (final expense in vehicleExpenses) {
           totalExpenses += expense.amount;
+          vehicleTotals.update(
+            vehicle.id,
+            (value) => value + expense.amount,
+            ifAbsent: () => expense.amount,
+          );
           categoryTotals.update(
             expense.category,
             (value) => value + expense.amount,
@@ -145,6 +151,18 @@ class ReportsCubit extends Cubit<ReportsState> {
               )
               .toList(growable: false)
             ..sort((a, b) => a.monthStart.compareTo(b.monthStart));
+      final vehicleComparison =
+          vehicles
+              .where((vehicle) => (vehicleTotals[vehicle.id] ?? 0) > 0)
+              .map(
+                (vehicle) => VehicleSpend(
+                  vehicleId: vehicle.id,
+                  vehicleName: vehicle.displayName,
+                  total: vehicleTotals[vehicle.id] ?? 0,
+                ),
+              )
+              .toList(growable: false)
+            ..sort((a, b) => b.total.compareTo(a.total));
 
       final baseline = _buildCostPerKmBaseline(
         vehicles: vehicles,
@@ -169,6 +187,7 @@ class ReportsCubit extends Cubit<ReportsState> {
           totalOwnershipCost: totalPurchase + totalExpenses,
           categoryBreakdown: categoryBreakdown,
           monthlyTrend: monthlyTrend,
+          vehicleComparison: vehicleComparison,
           baselineVehicleCount: baseline.vehicleCount,
           reminderUpcomingCount: reminderSummary.totalUpcoming,
           reminderOverdueCount: reminderSummary.totalOverdue,

@@ -48,6 +48,21 @@ class MonthlySpend extends Equatable {
   List<Object> get props => [monthStart, total];
 }
 
+class VehicleSpend extends Equatable {
+  const VehicleSpend({
+    required this.vehicleId,
+    required this.vehicleName,
+    required this.total,
+  });
+
+  final int vehicleId;
+  final String vehicleName;
+  final double total;
+
+  @override
+  List<Object> get props => [vehicleId, vehicleName, total];
+}
+
 class MonthlyDeltaSummary extends Equatable {
   const MonthlyDeltaSummary({
     required this.previousMonth,
@@ -92,6 +107,7 @@ class ReportsState extends Equatable {
     this.totalOwnershipCost = 0,
     this.categoryBreakdown = const [],
     this.monthlyTrend = const [],
+    this.vehicleComparison = const [],
     this.costPerKmBaseline,
     this.baselineVehicleCount = 0,
     this.reminderUpcomingCount = 0,
@@ -114,6 +130,7 @@ class ReportsState extends Equatable {
   final double totalOwnershipCost;
   final List<CategorySpend> categoryBreakdown;
   final List<MonthlySpend> monthlyTrend;
+  final List<VehicleSpend> vehicleComparison;
   final double? costPerKmBaseline;
   final int baselineVehicleCount;
   final int reminderUpcomingCount;
@@ -126,6 +143,17 @@ class ReportsState extends Equatable {
 
   CategorySpend? get topCostCategory =>
       categoryBreakdown.isEmpty ? null : categoryBreakdown.first;
+
+  double? get averageMonthlySpend {
+    if (monthlyTrend.isEmpty) {
+      return null;
+    }
+    final total = monthlyTrend.fold<double>(
+      0,
+      (sum, month) => sum + month.total,
+    );
+    return total / monthlyTrend.length;
+  }
 
   MonthlyDeltaSummary? get monthlyDeltaSummary {
     if (monthlyTrend.length < 2) {
@@ -162,6 +190,7 @@ class ReportsState extends Equatable {
     double? totalOwnershipCost,
     List<CategorySpend>? categoryBreakdown,
     List<MonthlySpend>? monthlyTrend,
+    List<VehicleSpend>? vehicleComparison,
     double? costPerKmBaseline,
     bool clearCostPerKmBaseline = false,
     int? baselineVehicleCount,
@@ -185,6 +214,7 @@ class ReportsState extends Equatable {
       totalOwnershipCost: totalOwnershipCost ?? this.totalOwnershipCost,
       categoryBreakdown: categoryBreakdown ?? this.categoryBreakdown,
       monthlyTrend: monthlyTrend ?? this.monthlyTrend,
+      vehicleComparison: vehicleComparison ?? this.vehicleComparison,
       costPerKmBaseline: clearCostPerKmBaseline
           ? null
           : (costPerKmBaseline ?? this.costPerKmBaseline),
@@ -217,6 +247,7 @@ class ReportsState extends Equatable {
     totalOwnershipCost,
     categoryBreakdown,
     monthlyTrend,
+    vehicleComparison,
     costPerKmBaseline,
     baselineVehicleCount,
     reminderUpcomingCount,

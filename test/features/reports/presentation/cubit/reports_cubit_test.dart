@@ -138,7 +138,56 @@ void main() {
     expect(monthlyDelta.currentMonth, DateTime(2025, 2));
     expect(monthlyDelta.amount, 120);
     expect(monthlyDelta.changeRatio, 1.2);
+    expect(cubit.state.averageMonthlySpend, 160);
   });
+
+  test(
+    'vehicle comparison ranks vehicles by spend in selected range',
+    () async {
+      final sedan = buildVehicle(id: 1);
+      final hatch = buildVehicle(id: 2);
+      final cubit = ReportsCubit(
+        _FakeVehicleRepository([sedan, hatch]),
+        _FakeExpenseRepository({
+          sedan.id: [
+            buildExpense(
+              id: 1,
+              vehicleId: sedan.id,
+              date: DateTime(2025, 3, 8),
+              amount: 60,
+              category: ExpenseCategory.fuel,
+            ),
+            buildExpense(
+              id: 2,
+              vehicleId: sedan.id,
+              date: DateTime(2025, 3, 14),
+              amount: 40,
+              category: ExpenseCategory.service,
+            ),
+          ],
+          hatch.id: [
+            buildExpense(
+              id: 3,
+              vehicleId: hatch.id,
+              date: DateTime(2025, 3, 10),
+              amount: 300,
+              category: ExpenseCategory.repairs,
+            ),
+          ],
+        }),
+        _FakeSettingsRepository(),
+        const ReminderComputationService(),
+      );
+
+      await cubit.setCustomRange(DateTime(2025, 3, 1), DateTime(2025, 3, 31));
+
+      expect(cubit.state.vehicleComparison, hasLength(2));
+      expect(cubit.state.vehicleComparison.first.vehicleId, hatch.id);
+      expect(cubit.state.vehicleComparison.first.total, 300);
+      expect(cubit.state.vehicleComparison.last.vehicleId, sedan.id);
+      expect(cubit.state.vehicleComparison.last.total, 100);
+    },
+  );
 }
 
 class _FakeVehicleRepository implements VehicleRepository {
