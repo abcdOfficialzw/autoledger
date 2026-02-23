@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/formatting/formatters.dart';
 import '../../expenses/domain/expense_repository.dart';
+import '../../expenses/presentation/add_expense_page.dart';
 import '../../settings/domain/app_preferences.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../../shell/presentation/navigation_cubit.dart';
@@ -96,9 +97,15 @@ class _DashboardPageState extends State<DashboardPage> {
                 const _HeroPanel(),
                 const SizedBox(height: 16),
                 _ActionPanel(
-                  onAddExpense: () => _goToTab(2),
+                  onAddExpense: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const AddExpensePage(),
+                      ),
+                    );
+                  },
                   onVehicles: () => _goToTab(1),
-                  onReports: () => _goToTab(3),
+                  onReports: () => _goToTab(2),
                 ),
                 const SizedBox(height: 16),
                 FutureBuilder<_DashboardMetrics>(

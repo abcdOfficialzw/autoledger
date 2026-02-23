@@ -14,7 +14,6 @@ class HomeShell extends StatelessWidget {
   static const _pages = [
     DashboardPage(),
     VehiclesPage(),
-    AddExpensePage(),
     ReportsPage(),
     SettingsPage(),
   ];
@@ -28,9 +27,26 @@ class HomeShell extends StatelessWidget {
           body: SafeArea(child: _pages[index]),
           bottomNavigationBar: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: _FloatingNavBar(
-              selectedIndex: index,
-              onTap: (value) => context.read<NavigationCubit>().setIndex(value),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _FloatingNavBar(
+                    selectedIndex: index,
+                    onTap: (value) =>
+                        context.read<NavigationCubit>().setIndex(value),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                _AddFab(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const AddExpensePage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         );
@@ -46,9 +62,8 @@ class _FloatingNavBar extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   static const _items = [
-    (Icons.dashboard_outlined, 'Dashboard'),
+    (Icons.home_outlined, 'Home'),
     (Icons.directions_car_outlined, 'Vehicles'),
-    (Icons.add_circle_outline, 'Add Expense'),
     (Icons.bar_chart_outlined, 'Reports'),
     (Icons.settings_outlined, 'Settings'),
   ];
@@ -79,55 +94,75 @@ class _FloatingNavBar extends StatelessWidget {
               final item = _items[index];
               final isSelected = selectedIndex == index;
               return Expanded(
-                child: Semantics(
-                  button: true,
-                  selected: isSelected,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(24),
-                    onTap: () => onTap(index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(vertical: 9),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        color: isSelected
-                            ? const Color(0xFFDDE0E5)
-                            : Colors.transparent,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            item.$1,
-                            size: 22,
-                            color: isSelected
-                                ? colorScheme.primary
-                                : const Color(0xFF111111),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            item.$2,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: isSelected
-                                      ? colorScheme.primary
-                                      : const Color(0xFF111111),
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                ),
-                          ),
-                        ],
-                      ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(24),
+                  onTap: () => onTap(index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutCubic,
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      color: isSelected
+                          ? const Color(0xFFDDE0E5)
+                          : Colors.transparent,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          item.$1,
+                          size: 22,
+                          color: isSelected
+                              ? colorScheme.primary
+                              : const Color(0xFF111111),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          item.$2,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: isSelected
+                                    ? colorScheme.primary
+                                    : const Color(0xFF111111),
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               );
             }),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddFab extends StatelessWidget {
+  const _AddFab({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      shape: const CircleBorder(),
+      elevation: 8,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onPressed,
+        child: const SizedBox(
+          width: 64,
+          height: 64,
+          child: Icon(Icons.add, size: 30),
         ),
       ),
     );
