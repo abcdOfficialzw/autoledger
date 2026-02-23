@@ -6,6 +6,8 @@ import '../../expenses/domain/expense.dart';
 import '../../expenses/domain/expense_category.dart';
 import '../../expenses/domain/expense_repository.dart';
 import '../../expenses/domain/services/csv_export_service.dart';
+import '../../settings/domain/app_preferences.dart';
+import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../domain/vehicle.dart';
 import 'cubit/vehicle_detail_cubit.dart';
 import 'cubit/vehicle_detail_state.dart';
@@ -299,6 +301,11 @@ class _VehicleDetailView extends StatelessWidget {
           }
         },
         builder: (context, state) {
+          final preferences = context.select(
+            (SettingsCubit cubit) => cubit.state.preferences,
+          );
+          final distanceUnit = preferences.distanceUnit;
+
           final sortedExpenses = List<Expense>.from(state.expenses)
             ..sort((a, b) => b.date.compareTo(a.date));
 
@@ -357,13 +364,13 @@ class _VehicleDetailView extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text('Reg: ${vehicle.registrationNumber}'),
                         Text(
-                          'Purchase: ${Formatters.currency(vehicle.purchasePrice)}',
+                          'Purchase: ${Formatters.currency(vehicle.purchasePrice, currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}',
                         ),
                         Text(
                           'Purchased on ${Formatters.date(vehicle.purchaseDate)}',
                         ),
                         Text(
-                          'Initial mileage: ${Formatters.number(vehicle.initialMileage)} km',
+                          'Initial mileage: ${Formatters.number(distanceUnit.fromKilometers(vehicle.initialMileage))} ${distanceUnit.shortLabel}',
                         ),
                       ],
                     ),
@@ -381,14 +388,16 @@ class _VehicleDetailView extends StatelessWidget {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
-                        Text('Total spent: ${Formatters.currency(totalSpent)}'),
                         Text(
-                          'Fuel vs maintenance: ${Formatters.currency(fuelSpent)} / ${Formatters.currency(maintenanceSpent)}',
+                          'Total spent: ${Formatters.currency(totalSpent, currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}',
+                        ),
+                        Text(
+                          'Fuel vs maintenance: ${Formatters.currency(fuelSpent, currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)} / ${Formatters.currency(maintenanceSpent, currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}',
                         ),
                         Text(
                           topCategoryEntry == null
                               ? 'Top category: N/A'
-                              : 'Top category: ${topCategoryEntry.key.label} (${Formatters.currency(topCategoryEntry.value)})',
+                              : 'Top category: ${topCategoryEntry.key.label} (${Formatters.currency(topCategoryEntry.value, currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)})',
                         ),
                       ],
                     ),
@@ -433,14 +442,18 @@ class _VehicleDetailView extends StatelessWidget {
                                 expense.vendor!.trim().isNotEmpty)
                               expense.vendor!.trim(),
                             if (expense.odometer != null)
-                              '${Formatters.number(expense.odometer!)} km',
+                              '${Formatters.number(distanceUnit.fromKilometers(expense.odometer!))} ${distanceUnit.shortLabel}',
                           ].join(' - '),
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              Formatters.currency(expense.amount),
+                              Formatters.currency(
+                                expense.amount,
+                                currencyCode: preferences.currencyCode,
+                                currencySymbol: preferences.currencySymbol,
+                              ),
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             IconButton(

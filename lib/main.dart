@@ -10,6 +10,9 @@ import 'features/expenses/data/services/local_csv_export_service.dart';
 import 'features/expenses/domain/expense_repository.dart';
 import 'features/expenses/domain/services/csv_export_service.dart';
 import 'features/expenses/presentation/cubit/add_expense_cubit.dart';
+import 'features/settings/data/local_settings_repository.dart';
+import 'features/settings/domain/settings_repository.dart';
+import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/shell/presentation/navigation_cubit.dart';
 import 'features/vehicles/data/isar_vehicle_repository.dart';
 import 'features/vehicles/domain/vehicle_repository.dart';
@@ -18,7 +21,9 @@ import 'features/vehicles/presentation/cubit/vehicle_cubit.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final isar = await LocalDatabase.open();
-  runApp(AutoLedgerApp(isar: isar));
+  runApp(
+    AutoLedgerApp(isar: isar, settingsRepository: LocalSettingsRepository()),
+  );
 }
 
 class AutoLedgerApp extends StatelessWidget {
@@ -26,6 +31,7 @@ class AutoLedgerApp extends StatelessWidget {
     this.isar,
     this.vehicleRepository,
     this.expenseRepository,
+    required this.settingsRepository,
     super.key,
   }) : assert(
          isar != null ||
@@ -36,6 +42,7 @@ class AutoLedgerApp extends StatelessWidget {
   final Isar? isar;
   final VehicleRepository? vehicleRepository;
   final ExpenseRepository? expenseRepository;
+  final SettingsRepository settingsRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +64,18 @@ class AutoLedgerApp extends StatelessWidget {
           create: (_) => resolvedExpenseRepository,
         ),
         RepositoryProvider<CsvExportService>(create: (_) => csvExportService),
+        RepositoryProvider<SettingsRepository>(
+          create: (_) => settingsRepository,
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => NavigationCubit()),
+          BlocProvider(
+            create: (context) =>
+                SettingsCubit(context.read<SettingsRepository>())
+                  ..loadPreferences(),
+          ),
           BlocProvider(
             create: (context) =>
                 VehicleCubit(context.read<VehicleRepository>()),

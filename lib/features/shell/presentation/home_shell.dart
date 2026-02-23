@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../expenses/presentation/add_expense_page.dart';
 import '../../reports/presentation/reports_page.dart';
+import '../../settings/presentation/settings_page.dart';
 import '../../vehicles/presentation/vehicles_page.dart';
 import 'navigation_cubit.dart';
 
@@ -13,7 +14,7 @@ class HomeShell extends StatelessWidget {
     VehiclesPage(),
     AddExpensePage(),
     ReportsPage(),
-    PlaceholderPage(title: 'Settings'),
+    SettingsPage(),
   ];
 
   @override
@@ -47,22 +48,6 @@ class HomeShell extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class PlaceholderPage extends StatelessWidget {
-  const PlaceholderPage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '$title coming soon',
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
     );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
+import '../../../core/formatting/formatters.dart';
 import '../../expenses/presentation/cubit/add_expense_cubit.dart';
+import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../domain/vehicle.dart';
 import 'vehicle_detail_page.dart';
 import 'cubit/vehicle_cubit.dart';
@@ -18,8 +19,6 @@ class VehiclesPage extends StatefulWidget {
 }
 
 class _VehiclesPageState extends State<VehiclesPage> {
-  final _currency = NumberFormat.simpleCurrency();
-
   @override
   void initState() {
     super.initState();
@@ -135,6 +134,9 @@ class _VehiclesPageState extends State<VehiclesPage> {
         }
       },
       builder: (context, state) {
+        final preferences = context.select(
+          (SettingsCubit cubit) => cubit.state.preferences,
+        );
         final vehicles = state.vehicles;
 
         return Scaffold(
@@ -193,6 +195,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
                         padding: const EdgeInsets.only(bottom: 12),
                         child: VehicleCard(
                           vehicle: vehicle,
+                          distanceUnit: preferences.distanceUnit,
                           onTap: () => _openVehicleDetail(vehicle),
                           onEdit: () => _openEditForm(vehicle),
                           onDelete: () => _confirmDelete(vehicle),
@@ -203,7 +206,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
                       child: Text(
-                        'Total purchase value: ${_currency.format(vehicles.fold<double>(0, (sum, v) => sum + v.purchasePrice))}',
+                        'Total purchase value: ${Formatters.currency(vehicles.fold<double>(0, (sum, v) => sum + v.purchasePrice), currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),

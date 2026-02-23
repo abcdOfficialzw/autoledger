@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:motoledger/features/expenses/domain/expense.dart';
 import 'package:motoledger/features/expenses/domain/expense_category.dart';
 import 'package:motoledger/features/expenses/domain/expense_repository.dart';
+import 'package:motoledger/features/settings/domain/app_preferences.dart';
+import 'package:motoledger/features/settings/domain/settings_repository.dart';
 import 'package:motoledger/features/vehicles/domain/vehicle.dart';
 import 'package:motoledger/features/vehicles/domain/vehicle_repository.dart';
 import 'package:motoledger/main.dart';
@@ -12,12 +14,19 @@ void main() {
       AutoLedgerApp(
         vehicleRepository: _FakeVehicleRepository(),
         expenseRepository: _FakeExpenseRepository(),
+        settingsRepository: _FakeSettingsRepository(),
       ),
     );
 
     await tester.pumpAndSettle();
 
     expect(find.text('Add Vehicle'), findsWidgets);
+
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Currency'), findsOneWidget);
+    expect(find.text('Distance unit'), findsOneWidget);
   });
 }
 
@@ -149,5 +158,17 @@ class _FakeExpenseRepository implements ExpenseRepository {
           return true;
         })
         .toList(growable: false);
+  }
+}
+
+class _FakeSettingsRepository implements SettingsRepository {
+  AppPreferences _preferences = const AppPreferences();
+
+  @override
+  Future<AppPreferences> loadPreferences() async => _preferences;
+
+  @override
+  Future<void> savePreferences(AppPreferences preferences) async {
+    _preferences = preferences;
   }
 }

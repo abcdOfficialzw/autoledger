@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/formatting/formatters.dart';
 import '../../expenses/domain/expense_repository.dart';
 import '../../expenses/domain/services/csv_export_service.dart';
+import '../../settings/domain/app_preferences.dart';
+import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../../vehicles/domain/vehicle_repository.dart';
 import 'cubit/reports_cubit.dart';
 import 'cubit/reports_state.dart';
@@ -91,6 +93,10 @@ class _ReportsViewState extends State<_ReportsView> {
         }
       },
       builder: (context, state) {
+        final preferences = context.select(
+          (SettingsCubit cubit) => cubit.state.preferences,
+        );
+        final distanceUnitLabel = preferences.distanceUnit.shortLabel;
         final hasData = state.totalExpenses > 0 || state.totalPurchase > 0;
 
         return RefreshIndicator(
@@ -166,7 +172,7 @@ class _ReportsViewState extends State<_ReportsView> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Add vehicles and expenses to see totals, trends, and cost per km.',
+                          'Add vehicles and expenses to see totals, trends, and cost per $distanceUnitLabel.',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -177,24 +183,36 @@ class _ReportsViewState extends State<_ReportsView> {
                 _SummaryCard(
                   title: 'Total ownership cost',
                   subtitle: 'Purchase totals + filtered expenses',
-                  value: Formatters.currency(state.totalOwnershipCost),
+                  value: Formatters.currency(
+                    state.totalOwnershipCost,
+                    currencyCode: preferences.currencyCode,
+                    currencySymbol: preferences.currencySymbol,
+                  ),
                 ),
                 _SummaryCard(
                   title: 'Total purchase value',
-                  value: Formatters.currency(state.totalPurchase),
+                  value: Formatters.currency(
+                    state.totalPurchase,
+                    currencyCode: preferences.currencyCode,
+                    currencySymbol: preferences.currencySymbol,
+                  ),
                 ),
                 _SummaryCard(
                   title: 'Total logged expenses',
-                  value: Formatters.currency(state.totalExpenses),
+                  value: Formatters.currency(
+                    state.totalExpenses,
+                    currencyCode: preferences.currencyCode,
+                    currencySymbol: preferences.currencySymbol,
+                  ),
                 ),
                 _SummaryCard(
-                  title: 'Cost/km baseline',
+                  title: 'Cost/$distanceUnitLabel baseline',
                   subtitle: state.costPerKmBaseline == null
                       ? 'Insufficient odometer records in this range. Add odometer readings to expenses.'
                       : 'Based on ${state.baselineVehicleCount} vehicle(s) with mileage logs.',
                   value: state.costPerKmBaseline == null
                       ? 'N/A'
-                      : '${Formatters.currency(state.costPerKmBaseline!)}/km',
+                      : '${Formatters.currency(preferences.distanceUnit.fromCostPerKilometer(state.costPerKmBaseline!), currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}/$distanceUnitLabel',
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -213,7 +231,11 @@ class _ReportsViewState extends State<_ReportsView> {
                         title: Text(entry.category.label),
                         subtitle: Text(Formatters.percent(entry.percentage)),
                         trailing: Text(
-                          Formatters.currency(entry.total),
+                          Formatters.currency(
+                            entry.total,
+                            currencyCode: preferences.currencyCode,
+                            currencySymbol: preferences.currencySymbol,
+                          ),
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
@@ -237,7 +259,11 @@ class _ReportsViewState extends State<_ReportsView> {
                           '${entry.monthStart.year}-${entry.monthStart.month.toString().padLeft(2, '0')}',
                         ),
                         trailing: Text(
-                          Formatters.currency(entry.total),
+                          Formatters.currency(
+                            entry.total,
+                            currencyCode: preferences.currencyCode,
+                            currencySymbol: preferences.currencySymbol,
+                          ),
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
