@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/presentation/liquid_glass.dart';
 import '../../domain/vehicle.dart';
 
 class VehicleFormResult {
@@ -160,252 +161,258 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _nicknameController,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Nickname (optional)',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _makeController,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Make'),
-                  validator: _requiredValidator,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _modelController,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Model'),
-                  validator: _requiredValidator,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _yearController,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Year'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Year is required';
-                    }
-                    final parsed = int.tryParse(value.trim());
-                    if (parsed == null ||
-                        parsed < 1900 ||
-                        parsed > DateTime.now().year + 1) {
-                      return 'Enter a valid year';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _regController,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Registration number',
-                  ),
-                  validator: _requiredValidator,
-                ),
-                const SizedBox(height: 12),
-                InkWell(
-                  onTap: _pickDate,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Purchase date',
+        child: LiquidBackdrop(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+            child: LiquidGlassCard(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _nicknameController,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Nickname (optional)',
+                      ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          MaterialLocalizations.of(
-                            context,
-                          ).formatMediumDate(_purchaseDate),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _makeController,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(labelText: 'Make'),
+                      validator: _requiredValidator,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _modelController,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(labelText: 'Model'),
+                      validator: _requiredValidator,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _yearController,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(labelText: 'Year'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Year is required';
+                        }
+                        final parsed = int.tryParse(value.trim());
+                        if (parsed == null ||
+                            parsed < 1900 ||
+                            parsed > DateTime.now().year + 1) {
+                          return 'Enter a valid year';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _regController,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Registration number',
+                      ),
+                      validator: _requiredValidator,
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: _pickDate,
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Purchase date',
                         ),
-                        const Icon(Icons.calendar_today_outlined),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _purchasePriceController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Purchase price',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Purchase price is required';
-                    }
-                    final parsed = double.tryParse(value.trim());
-                    if (parsed == null || parsed < 0) {
-                      return 'Enter a valid amount';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _initialMileageController,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Initial mileage',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Initial mileage is required';
-                    }
-                    final parsed = int.tryParse(value.trim());
-                    if (parsed == null || parsed < 0) {
-                      return 'Enter a valid mileage';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _serviceIntervalController,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Service interval (km, optional)',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return null;
-                    }
-                    final parsed = int.tryParse(value.trim());
-                    if (parsed == null || parsed <= 0) {
-                      return 'Enter a valid interval';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _lastServiceMileageController,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Last service mileage (optional)',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return null;
-                    }
-                    final parsed = int.tryParse(value.trim());
-                    if (parsed == null || parsed < 0) {
-                      return 'Enter a valid mileage';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                InkWell(
-                  onTap: () async {
-                    final now = DateTime.now();
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _lastServiceDate ?? now,
-                      firstDate: DateTime(now.year - 30),
-                      lastDate: DateTime(now.year + 5),
-                    );
-                    if (picked == null) {
-                      return;
-                    }
-                    setState(() => _lastServiceDate = picked);
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'Last service date (optional)',
-                      suffixIcon: _lastServiceDate == null
-                          ? null
-                          : IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                setState(() => _lastServiceDate = null);
-                              },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              MaterialLocalizations.of(
+                                context,
+                              ).formatMediumDate(_purchaseDate),
                             ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _lastServiceDate == null
-                              ? 'Not set'
-                              : MaterialLocalizations.of(
-                                  context,
-                                ).formatMediumDate(_lastServiceDate!),
+                            const Icon(Icons.calendar_today_outlined),
+                          ],
                         ),
-                        const Icon(Icons.calendar_today_outlined),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                InkWell(
-                  onTap: () async {
-                    final now = DateTime.now();
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _licenseExpiryDate ?? now,
-                      firstDate: DateTime(now.year - 5),
-                      lastDate: DateTime(now.year + 10),
-                    );
-                    if (picked == null) {
-                      return;
-                    }
-                    setState(() => _licenseExpiryDate = picked);
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'License expiry date (optional)',
-                      suffixIcon: _licenseExpiryDate == null
-                          ? null
-                          : IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                setState(() => _licenseExpiryDate = null);
-                              },
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _purchasePriceController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Purchase price',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Purchase price is required';
+                        }
+                        final parsed = double.tryParse(value.trim());
+                        if (parsed == null || parsed < 0) {
+                          return 'Enter a valid amount';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _initialMileageController,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Initial mileage',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Initial mileage is required';
+                        }
+                        final parsed = int.tryParse(value.trim());
+                        if (parsed == null || parsed < 0) {
+                          return 'Enter a valid mileage';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _serviceIntervalController,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Service interval (km, optional)',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return null;
+                        }
+                        final parsed = int.tryParse(value.trim());
+                        if (parsed == null || parsed <= 0) {
+                          return 'Enter a valid interval';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _lastServiceMileageController,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Last service mileage (optional)',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return null;
+                        }
+                        final parsed = int.tryParse(value.trim());
+                        if (parsed == null || parsed < 0) {
+                          return 'Enter a valid mileage';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: _lastServiceDate ?? now,
+                          firstDate: DateTime(now.year - 30),
+                          lastDate: DateTime(now.year + 5),
+                        );
+                        if (picked == null) {
+                          return;
+                        }
+                        setState(() => _lastServiceDate = picked);
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'Last service date (optional)',
+                          suffixIcon: _lastServiceDate == null
+                              ? null
+                              : IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    setState(() => _lastServiceDate = null);
+                                  },
+                                ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _lastServiceDate == null
+                                  ? 'Not set'
+                                  : MaterialLocalizations.of(
+                                      context,
+                                    ).formatMediumDate(_lastServiceDate!),
                             ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _licenseExpiryDate == null
-                              ? 'Not set'
-                              : MaterialLocalizations.of(
-                                  context,
-                                ).formatMediumDate(_licenseExpiryDate!),
+                            const Icon(Icons.calendar_today_outlined),
+                          ],
                         ),
-                        const Icon(Icons.calendar_today_outlined),
-                      ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: _licenseExpiryDate ?? now,
+                          firstDate: DateTime(now.year - 5),
+                          lastDate: DateTime(now.year + 10),
+                        );
+                        if (picked == null) {
+                          return;
+                        }
+                        setState(() => _licenseExpiryDate = picked);
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'License expiry date (optional)',
+                          suffixIcon: _licenseExpiryDate == null
+                              ? null
+                              : IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    setState(() => _licenseExpiryDate = null);
+                                  },
+                                ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _licenseExpiryDate == null
+                                  ? 'Not set'
+                                  : MaterialLocalizations.of(
+                                      context,
+                                    ).formatMediumDate(_licenseExpiryDate!),
+                            ),
+                            const Icon(Icons.calendar_today_outlined),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: _submit,
+                        child: Text(
+                          _isEdit ? 'Update Vehicle' : 'Save Vehicle',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: _submit,
-                    child: Text(_isEdit ? 'Update Vehicle' : 'Save Vehicle'),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

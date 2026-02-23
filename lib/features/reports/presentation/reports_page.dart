@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/formatting/formatters.dart';
+import '../../../core/presentation/liquid_glass.dart';
 import '../../expenses/domain/expense_repository.dart';
 import '../../expenses/domain/services/csv_export_service.dart';
 import '../../reminders/domain/services/reminder_computation_service.dart';
@@ -128,131 +129,133 @@ class _ReportsViewState extends State<_ReportsView> {
         final monthlyDelta = state.monthlyDeltaSummary;
         final avgMonthlySpend = state.averageMonthlySpend;
 
-        return RefreshIndicator(
-          onRefresh: context.read<ReportsCubit>().load,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-            children: [
-              _DashboardHeader(
-                onExportCsv: _exportAllCsv,
-                hasData: hasData,
-                totalOwnershipCost: state.totalOwnershipCost,
-                currencyCode: preferences.currencyCode,
-                currencySymbol: preferences.currencySymbol,
-              ),
-              const SizedBox(height: 16),
-              _DateFilterPanel(
-                state: state,
-                onRangeSelected: (range) async {
-                  if (range == ReportsDateRange.custom) {
-                    await _pickCustomDateRange(state);
-                    return;
-                  }
-                  await context.read<ReportsCubit>().setDateRange(range);
-                },
-                onPickCustom: () => _pickCustomDateRange(state),
-                onResetCustom: () {
-                  context.read<ReportsCubit>().setDateRange(
-                    ReportsDateRange.last30Days,
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              if (state.status == ReportsStatus.loading)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 48),
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else if (!hasData)
-                _LargeEmptyState(
-                  title: 'No report data yet',
-                  message:
-                      'Add vehicles and expenses to unlock trend lines, category distribution, and cost-per-$distanceUnitLabel tracking.',
-                  actionLabel: 'Show all-time range',
-                  onAction: () {
+        return LiquidBackdrop(
+          child: RefreshIndicator(
+            onRefresh: context.read<ReportsCubit>().load,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+              children: [
+                _DashboardHeader(
+                  onExportCsv: _exportAllCsv,
+                  hasData: hasData,
+                  totalOwnershipCost: state.totalOwnershipCost,
+                  currencyCode: preferences.currencyCode,
+                  currencySymbol: preferences.currencySymbol,
+                ),
+                const SizedBox(height: 16),
+                _DateFilterPanel(
+                  state: state,
+                  onRangeSelected: (range) async {
+                    if (range == ReportsDateRange.custom) {
+                      await _pickCustomDateRange(state);
+                      return;
+                    }
+                    await context.read<ReportsCubit>().setDateRange(range);
+                  },
+                  onPickCustom: () => _pickCustomDateRange(state),
+                  onResetCustom: () {
                     context.read<ReportsCubit>().setDateRange(
-                      ReportsDateRange.allTime,
+                      ReportsDateRange.last30Days,
                     );
                   },
-                )
-              else ...[
-                _MetricsSection(
-                  preferences: preferences,
-                  distanceUnitLabel: distanceUnitLabel,
-                  totalOwnershipCost: state.totalOwnershipCost,
-                  avgMonthlySpend: avgMonthlySpend,
-                  costPerKmBaseline: state.costPerKmBaseline,
-                  topCategory: topCategory,
-                  monthlyDelta: monthlyDelta,
-                  baselineVehicleCount: state.baselineVehicleCount,
                 ),
                 const SizedBox(height: 16),
-                _SectionCard(
-                  title: 'Monthly spend trend',
-                  subtitle:
-                      'Line chart highlights direction while bars emphasize absolute spend.',
-                  child: state.monthlyTrend.isEmpty
-                      ? _SectionEmptyState(
-                          icon: Icons.show_chart_outlined,
-                          message: 'No monthly spend data in this range.',
-                          actionLabel: 'Use all-time range',
-                          onAction: () {
-                            context.read<ReportsCubit>().setDateRange(
-                              ReportsDateRange.allTime,
-                            );
-                          },
-                        )
-                      : _MonthlyTrendCharts(
-                          monthlyTrend: state.monthlyTrend,
-                          formatMonthLabel: _formatMonthLabel,
-                          currencyCode: preferences.currencyCode,
-                          currencySymbol: preferences.currencySymbol,
-                        ),
-                ),
-                const SizedBox(height: 16),
-                _SectionCard(
-                  title: 'Category distribution',
-                  subtitle:
-                      'Share of filtered expenses by category with top category spotlight.',
-                  child: state.categoryBreakdown.isEmpty
-                      ? _SectionEmptyState(
-                          icon: Icons.pie_chart_outline,
-                          message: 'No category distribution available.',
-                          actionLabel: 'Adjust date range',
-                          onAction: () => _pickCustomDateRange(state),
-                        )
-                      : _CategoryDistributionChart(
-                          categoryBreakdown: state.categoryBreakdown,
-                          currencyCode: preferences.currencyCode,
-                          currencySymbol: preferences.currencySymbol,
-                          palette: _categoryPalette,
-                        ),
-                ),
-                const SizedBox(height: 16),
-                _SectionCard(
-                  title: 'Vehicle comparison',
-                  subtitle:
-                      'Compare spend between vehicles in the active range.',
-                  child: state.vehicleComparison.isEmpty
-                      ? const _SectionEmptyState(
-                          icon: Icons.directions_car_outlined,
-                          message:
-                              'No vehicle-level comparison data in this range.',
-                        )
-                      : _VehicleComparisonChart(
-                          data: state.vehicleComparison,
-                          currencyCode: preferences.currencyCode,
-                          currencySymbol: preferences.currencySymbol,
-                        ),
-                ),
-                const SizedBox(height: 16),
-                _SectionCard(
-                  title: 'Reminder snapshot',
-                  subtitle: 'Service and license reminder workload overview.',
-                  child: _ReminderGrid(state: state),
-                ),
+                if (state.status == ReportsStatus.loading)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 48),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (!hasData)
+                  _LargeEmptyState(
+                    title: 'No report data yet',
+                    message:
+                        'Add vehicles and expenses to unlock trend lines, category distribution, and cost-per-$distanceUnitLabel tracking.',
+                    actionLabel: 'Show all-time range',
+                    onAction: () {
+                      context.read<ReportsCubit>().setDateRange(
+                        ReportsDateRange.allTime,
+                      );
+                    },
+                  )
+                else ...[
+                  _MetricsSection(
+                    preferences: preferences,
+                    distanceUnitLabel: distanceUnitLabel,
+                    totalOwnershipCost: state.totalOwnershipCost,
+                    avgMonthlySpend: avgMonthlySpend,
+                    costPerKmBaseline: state.costPerKmBaseline,
+                    topCategory: topCategory,
+                    monthlyDelta: monthlyDelta,
+                    baselineVehicleCount: state.baselineVehicleCount,
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: 'Monthly spend trend',
+                    subtitle:
+                        'Line chart highlights direction while bars emphasize absolute spend.',
+                    child: state.monthlyTrend.isEmpty
+                        ? _SectionEmptyState(
+                            icon: Icons.show_chart_outlined,
+                            message: 'No monthly spend data in this range.',
+                            actionLabel: 'Use all-time range',
+                            onAction: () {
+                              context.read<ReportsCubit>().setDateRange(
+                                ReportsDateRange.allTime,
+                              );
+                            },
+                          )
+                        : _MonthlyTrendCharts(
+                            monthlyTrend: state.monthlyTrend,
+                            formatMonthLabel: _formatMonthLabel,
+                            currencyCode: preferences.currencyCode,
+                            currencySymbol: preferences.currencySymbol,
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: 'Category distribution',
+                    subtitle:
+                        'Share of filtered expenses by category with top category spotlight.',
+                    child: state.categoryBreakdown.isEmpty
+                        ? _SectionEmptyState(
+                            icon: Icons.pie_chart_outline,
+                            message: 'No category distribution available.',
+                            actionLabel: 'Adjust date range',
+                            onAction: () => _pickCustomDateRange(state),
+                          )
+                        : _CategoryDistributionChart(
+                            categoryBreakdown: state.categoryBreakdown,
+                            currencyCode: preferences.currencyCode,
+                            currencySymbol: preferences.currencySymbol,
+                            palette: _categoryPalette,
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: 'Vehicle comparison',
+                    subtitle:
+                        'Compare spend between vehicles in the active range.',
+                    child: state.vehicleComparison.isEmpty
+                        ? const _SectionEmptyState(
+                            icon: Icons.directions_car_outlined,
+                            message:
+                                'No vehicle-level comparison data in this range.',
+                          )
+                        : _VehicleComparisonChart(
+                            data: state.vehicleComparison,
+                            currencyCode: preferences.currencyCode,
+                            currencySymbol: preferences.currencySymbol,
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: 'Reminder snapshot',
+                    subtitle: 'Service and license reminder workload overview.',
+                    child: _ReminderGrid(state: state),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         );
       },
@@ -278,66 +281,70 @@ class _DashboardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: [colors.primary, colors.primaryContainer],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return LiquidGlassCard(
+      padding: EdgeInsets.zero,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [colors.primary, colors.primaryContainer],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Auto Ledger Reports',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: colors.onPrimary,
-                      fontWeight: FontWeight.w700,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Auto Ledger Reports',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            color: colors.onPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                   ),
+                  FilledButton.tonalIcon(
+                    onPressed: onExportCsv,
+                    icon: const Icon(Icons.download_outlined),
+                    label: const Text('Export CSV'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Track total ownership cost, monthly movement, and category/vehicle drivers.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.onPrimary.withOpacity(0.92),
                 ),
-                FilledButton.tonalIcon(
-                  onPressed: onExportCsv,
-                  icon: const Icon(Icons.download_outlined),
-                  label: const Text('Export CSV'),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                hasData
+                    ? Formatters.currency(
+                        totalOwnershipCost,
+                        currencyCode: currencyCode,
+                        currencySymbol: currencySymbol,
+                      )
+                    : 'No spend yet',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: colors.onPrimary,
+                  fontWeight: FontWeight.w800,
                 ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Track total ownership cost, monthly movement, and category/vehicle drivers.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colors.onPrimary.withOpacity(0.92),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              hasData
-                  ? Formatters.currency(
-                      totalOwnershipCost,
-                      currencyCode: currencyCode,
-                      currencySymbol: currencySymbol,
-                    )
-                  : 'No spend yet',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: colors.onPrimary,
-                fontWeight: FontWeight.w800,
+              Text(
+                'Total ownership spend in selected period',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: colors.onPrimary.withOpacity(0.9),
+                ),
               ),
-            ),
-            Text(
-              'Total ownership spend in selected period',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.onPrimary.withOpacity(0.9),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -359,70 +366,68 @@ class _DateFilterPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Date Range',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: ReportsDateRange.values
-                  .map(
-                    (range) => ChoiceChip(
-                      selected: range == state.selectedRange,
-                      label: Text(range.label),
-                      onSelected: (_) => onRangeSelected(range),
-                    ),
-                  )
-                  .toList(growable: false),
-            ),
-            if (state.selectedRange == ReportsDateRange.custom) ...[
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onPickCustom,
-                      icon: const Icon(Icons.date_range_outlined),
-                      label: Text(
-                        state.customStart != null && state.customEnd != null
-                            ? '${Formatters.date(state.customStart!)} - ${Formatters.date(state.customEnd!)}'
-                            : 'Pick custom date range',
-                      ),
+    return LiquidGlassCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Date Range',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: ReportsDateRange.values
+                .map(
+                  (range) => ChoiceChip(
+                    selected: range == state.selectedRange,
+                    label: Text(range.label),
+                    onSelected: (_) => onRangeSelected(range),
+                  ),
+                )
+                .toList(growable: false),
+          ),
+          if (state.selectedRange == ReportsDateRange.custom) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onPickCustom,
+                    icon: const Icon(Icons.date_range_outlined),
+                    label: Text(
+                      state.customStart != null && state.customEnd != null
+                          ? '${Formatters.date(state.customStart!)} - ${Formatters.date(state.customEnd!)}'
+                          : 'Pick custom date range',
                     ),
                   ),
-                  if (state.customStart != null && state.customEnd != null)
-                    TextButton(
-                      onPressed: onResetCustom,
-                      child: const Text('Reset'),
-                    ),
-                ],
-              ),
-            ],
-            if (state.rangeStart != null && state.rangeEnd != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                'Applied: ${Formatters.date(state.rangeStart!)} - ${Formatters.date(state.rangeEnd!)}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ] else ...[
-              const SizedBox(height: 6),
-              Text(
-                'Applied: All-time',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
+                ),
+                if (state.customStart != null && state.customEnd != null)
+                  TextButton(
+                    onPressed: onResetCustom,
+                    child: const Text('Reset'),
+                  ),
+              ],
+            ),
           ],
-        ),
+          if (state.rangeStart != null && state.rangeEnd != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              'Applied: ${Formatters.date(state.rangeStart!)} - ${Formatters.date(state.rangeEnd!)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ] else ...[
+            const SizedBox(height: 6),
+            Text(
+              'Applied: All-time',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -577,41 +582,39 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer.withOpacity(0.8),
-                  child: Icon(data.icon, size: 18),
+    return LiquidInsetCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.primaryContainer.withOpacity(0.8),
+                child: Icon(data.icon, size: 18),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  data.title,
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    data.title,
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              data.value,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 4),
-            Text(data.subtitle, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            data.value,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 4),
+          Text(data.subtitle, style: Theme.of(context).textTheme.bodySmall),
+        ],
       ),
     );
   }
@@ -630,24 +633,22 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 4),
-            Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
+    return LiquidGlassCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 4),
+          Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 12),
+          child,
+        ],
       ),
     );
   }
@@ -1132,26 +1133,19 @@ class _SectionEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
+    return LiquidInsetCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(height: 8),
+          Text(message),
+          if (actionLabel != null && onAction != null) ...[
             const SizedBox(height: 8),
-            Text(message),
-            if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 8),
-              TextButton(onPressed: onAction, child: Text(actionLabel!)),
-            ],
+            TextButton(onPressed: onAction, child: Text(actionLabel!)),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -1172,34 +1166,32 @@ class _LargeEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              Icons.insights_outlined,
-              size: 28,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 8),
-            Text(message),
-            const SizedBox(height: 14),
-            OutlinedButton.icon(
-              onPressed: onAction,
-              icon: const Icon(Icons.calendar_view_month_outlined),
-              label: Text(actionLabel),
-            ),
-          ],
-        ),
+    return LiquidGlassCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.insights_outlined,
+            size: 28,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          Text(message),
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            onPressed: onAction,
+            icon: const Icon(Icons.calendar_view_month_outlined),
+            label: Text(actionLabel),
+          ),
+        ],
       ),
     );
   }

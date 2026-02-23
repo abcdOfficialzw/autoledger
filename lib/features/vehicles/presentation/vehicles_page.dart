@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/formatting/formatters.dart';
+import '../../../core/presentation/liquid_glass.dart';
 import '../../expenses/presentation/cubit/add_expense_cubit.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../domain/vehicle.dart';
@@ -163,229 +162,168 @@ class _VehiclesPageState extends State<VehiclesPage> {
         );
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF2F6FB),
           body: SafeArea(
-            child: Stack(
-              children: [
-                Positioned(
+            child: LiquidBackdrop(
+              orbs: [
+                LiquidOrb(
+                  diameter: 220,
                   top: -90,
                   right: -80,
-                  child: _BackgroundOrb(
-                    diameter: 220,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                  ),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
                 ),
-                Positioned(
+                LiquidOrb(
+                  diameter: 170,
                   top: 100,
                   left: -75,
-                  child: _BackgroundOrb(
-                    diameter: 170,
-                    color: theme.colorScheme.tertiary.withValues(alpha: 0.18),
-                  ),
+                  color: theme.colorScheme.tertiary.withValues(alpha: 0.18),
                 ),
-                Positioned(
+                LiquidOrb(
+                  diameter: 210,
                   bottom: -95,
                   right: -45,
-                  child: _BackgroundOrb(
-                    diameter: 210,
-                    color: theme.colorScheme.secondary.withValues(alpha: 0.16),
-                  ),
+                  color: theme.colorScheme.secondary.withValues(alpha: 0.16),
                 ),
-                RefreshIndicator(
-                  onRefresh: context.read<VehicleCubit>().loadVehicles,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                    children: [
-                      _GlassSection(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Vehicles',
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+              ],
+              child: RefreshIndicator(
+                onRefresh: context.read<VehicleCubit>().loadVehicles,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  children: [
+                    LiquidGlassCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Vehicles',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Track every ride, expenses, and reminders with a cleaner overview.',
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                FilledButton.icon(
-                                  onPressed: _openCreateForm,
-                                  icon: const Icon(Icons.add),
-                                  label: const Text('Add Vehicle'),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    '${vehicles.length} registered',
-                                    textAlign: TextAlign.right,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      if (vehicles.isNotEmpty)
-                        _GlassSection(
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: theme.colorScheme.primary.withValues(
-                                    alpha: 0.14,
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.payments_rounded,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Total purchase value',
-                                      style: theme.textTheme.labelLarge,
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      Formatters.currency(
-                                        totalPurchaseValue,
-                                        currencyCode: preferences.currencyCode,
-                                        currencySymbol:
-                                            preferences.currencySymbol,
-                                      ),
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
-                      const SizedBox(height: 14),
-                      if (state.status == VehicleStatus.loading)
-                        const Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Center(child: CircularProgressIndicator()),
-                        )
-                      else if (vehicles.isEmpty)
-                        _GlassSection(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          const SizedBox(height: 8),
+                          Text(
+                            'Track every ride, expenses, and reminders with a cleaner overview.',
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
                             children: [
-                              Text(
-                                'No vehicles yet',
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                'Add your first vehicle to start logging expenses, reminders, and reports.',
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                              const SizedBox(height: 14),
                               FilledButton.icon(
                                 onPressed: _openCreateForm,
                                 icon: const Icon(Icons.add),
                                 label: const Text('Add Vehicle'),
                               ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  '${vehicles.length} registered',
+                                  textAlign: TextAlign.right,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
-                        )
-                      else
-                        ...vehicles.map(
-                          (vehicle) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: VehicleCard(
-                              vehicle: vehicle,
-                              distanceUnit: preferences.distanceUnit,
-                              onTap: () => _openVehicleDetail(vehicle),
-                              onEdit: () => _openEditForm(vehicle),
-                              onDelete: () => _confirmDelete(vehicle),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    if (vehicles.isNotEmpty)
+                      LiquidGlassCard(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.14,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.payments_rounded,
+                                color: theme.colorScheme.primary,
+                              ),
                             ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Total purchase value',
+                                    style: theme.textTheme.labelLarge,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    Formatters.currency(
+                                      totalPurchaseValue,
+                                      currencyCode: preferences.currencyCode,
+                                      currencySymbol:
+                                          preferences.currencySymbol,
+                                    ),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w800),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 14),
+                    if (state.status == VehicleStatus.loading)
+                      const Padding(
+                        padding: EdgeInsets.all(32),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (vehicles.isEmpty)
+                      LiquidGlassCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'No vehicles yet',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Add your first vehicle to start logging expenses, reminders, and reports.',
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                            const SizedBox(height: 14),
+                            FilledButton.icon(
+                              onPressed: _openCreateForm,
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add Vehicle'),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ...vehicles.map(
+                        (vehicle) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: VehicleCard(
+                            vehicle: vehicle,
+                            distanceUnit: preferences.distanceUnit,
+                            onTap: () => _openVehicleDetail(vehicle),
+                            onEdit: () => _openEditForm(vehicle),
+                            onDelete: () => _confirmDelete(vehicle),
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
       },
-    );
-  }
-}
-
-class _BackgroundOrb extends StatelessWidget {
-  const _BackgroundOrb({required this.diameter, required this.color});
-
-  final double diameter;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Container(
-        width: diameter,
-        height: diameter,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      ),
-    );
-  }
-}
-
-class _GlassSection extends StatelessWidget {
-  const _GlassSection({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.42),
-              width: 1.1,
-            ),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.27),
-                Colors.white.withValues(alpha: 0.11),
-              ],
-            ),
-          ),
-          child: Padding(padding: const EdgeInsets.all(18), child: child),
-        ),
-      ),
     );
   }
 }

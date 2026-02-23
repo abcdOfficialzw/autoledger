@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/presentation/liquid_glass.dart';
 import '../../vehicles/presentation/cubit/vehicle_cubit.dart';
 import '../domain/expense_category.dart';
 import 'cubit/add_expense_cubit.dart';
@@ -99,176 +100,189 @@ class _AddExpensePageState extends State<AddExpensePage> {
       builder: (context, state) {
         return Scaffold(
           body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Text(
-                  'Quick Add Expense',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Log expenses in under 10 seconds.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 16),
-                if (state.status == AddExpenseStatus.loading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: CircularProgressIndicator()),
+            child: LiquidBackdrop(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+                children: [
+                  LiquidGlassCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Quick Add Expense',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Log expenses in under 10 seconds.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
                   ),
-                if (state.vehicles.isEmpty &&
-                    state.status != AddExpenseStatus.loading)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
+                  const SizedBox(height: 16),
+                  if (state.status == AddExpenseStatus.loading)
+                    const LiquidGlassCard(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                  if (state.vehicles.isEmpty &&
+                      state.status != AddExpenseStatus.loading)
+                    LiquidGlassCard(
                       child: Text(
                         'No vehicles available. Add a vehicle first from the Vehicles tab.',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
-                  ),
-                if (state.vehicles.isNotEmpty)
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        DropdownButtonFormField<int>(
-                          initialValue: state.selectedVehicleId,
-                          decoration: const InputDecoration(
-                            labelText: 'Vehicle',
-                          ),
-                          items: state.vehicles
-                              .map(
-                                (vehicle) => DropdownMenuItem<int>(
-                                  value: vehicle.id,
-                                  child: Text(vehicle.displayName),
-                                ),
-                              )
-                              .toList(growable: false),
-                          onChanged: (value) {
-                            if (value != null) {
-                              context
-                                  .read<AddExpenseCubit>()
-                                  .setSelectedVehicle(value);
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _amountController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          decoration: const InputDecoration(
-                            labelText: 'Amount',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Amount is required';
-                            }
-                            final parsed = double.tryParse(value.trim());
-                            if (parsed == null || parsed <= 0) {
-                              return 'Enter a valid amount';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<ExpenseCategory>(
-                          initialValue: state.selectedCategory,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
-                          ),
-                          items: ExpenseCategory.values
-                              .map(
-                                (category) => DropdownMenuItem<ExpenseCategory>(
-                                  value: category,
-                                  child: Text(category.label),
-                                ),
-                              )
-                              .toList(growable: false),
-                          onChanged: (value) {
-                            if (value != null) {
-                              context
-                                  .read<AddExpenseCubit>()
-                                  .setSelectedCategory(value);
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        InkWell(
-                          onTap: _pickDate,
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Date',
+                  if (state.vehicles.isNotEmpty)
+                    LiquidGlassCard(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            DropdownButtonFormField<int>(
+                              initialValue: state.selectedVehicleId,
+                              decoration: const InputDecoration(
+                                labelText: 'Vehicle',
+                              ),
+                              items: state.vehicles
+                                  .map(
+                                    (vehicle) => DropdownMenuItem<int>(
+                                      value: vehicle.id,
+                                      child: Text(vehicle.displayName),
+                                    ),
+                                  )
+                                  .toList(growable: false),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  context
+                                      .read<AddExpenseCubit>()
+                                      .setSelectedVehicle(value);
+                                }
+                              },
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  MaterialLocalizations.of(
-                                    context,
-                                  ).formatMediumDate(_expenseDate),
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _amountController,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              decoration: const InputDecoration(
+                                labelText: 'Amount',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Amount is required';
+                                }
+                                final parsed = double.tryParse(value.trim());
+                                if (parsed == null || parsed <= 0) {
+                                  return 'Enter a valid amount';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            DropdownButtonFormField<ExpenseCategory>(
+                              initialValue: state.selectedCategory,
+                              decoration: const InputDecoration(
+                                labelText: 'Category',
+                              ),
+                              items: ExpenseCategory.values
+                                  .map(
+                                    (category) =>
+                                        DropdownMenuItem<ExpenseCategory>(
+                                          value: category,
+                                          child: Text(category.label),
+                                        ),
+                                  )
+                                  .toList(growable: false),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  context
+                                      .read<AddExpenseCubit>()
+                                      .setSelectedCategory(value);
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            InkWell(
+                              onTap: _pickDate,
+                              child: InputDecorator(
+                                decoration: const InputDecoration(
+                                  labelText: 'Date',
                                 ),
-                                const Icon(Icons.calendar_today_outlined),
-                              ],
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      MaterialLocalizations.of(
+                                        context,
+                                      ).formatMediumDate(_expenseDate),
+                                    ),
+                                    const Icon(Icons.calendar_today_outlined),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _odometerController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Odometer (optional)',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return null;
-                            }
-                            final parsed = int.tryParse(value.trim());
-                            if (parsed == null || parsed < 0) {
-                              return 'Enter a valid odometer';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _vendorController,
-                          decoration: const InputDecoration(
-                            labelText: 'Vendor (optional)',
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _notesController,
-                          minLines: 2,
-                          maxLines: 4,
-                          decoration: const InputDecoration(
-                            labelText: 'Notes (optional)',
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: FilledButton(
-                            onPressed:
-                                state.status == AddExpenseStatus.submitting
-                                ? null
-                                : _saveExpense,
-                            child: Text(
-                              state.status == AddExpenseStatus.submitting
-                                  ? 'Saving...'
-                                  : 'Save Expense',
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _odometerController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'Odometer (optional)',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return null;
+                                }
+                                final parsed = int.tryParse(value.trim());
+                                if (parsed == null || parsed < 0) {
+                                  return 'Enter a valid odometer';
+                                }
+                                return null;
+                              },
                             ),
-                          ),
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _vendorController,
+                              decoration: const InputDecoration(
+                                labelText: 'Vendor (optional)',
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _notesController,
+                              minLines: 2,
+                              maxLines: 4,
+                              decoration: const InputDecoration(
+                                labelText: 'Notes (optional)',
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton(
+                                onPressed:
+                                    state.status == AddExpenseStatus.submitting
+                                    ? null
+                                    : _saveExpense,
+                                child: Text(
+                                  state.status == AddExpenseStatus.submitting
+                                      ? 'Saving...'
+                                      : 'Save Expense',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         );

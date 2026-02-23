@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/formatting/formatters.dart';
+import '../../../core/presentation/liquid_glass.dart';
 import '../../expenses/domain/expense.dart';
 import '../../expenses/domain/expense_category.dart';
 import '../../expenses/domain/expense_repository.dart';
@@ -64,6 +65,7 @@ class _VehicleDetailView extends StatelessWidget {
             context: context,
             builder: (context) {
               return AlertDialog(
+                backgroundColor: Colors.white.withValues(alpha: 0.95),
                 title: const Text('Reschedule service'),
                 content: Form(
                   key: formKey,
@@ -166,6 +168,7 @@ class _VehicleDetailView extends StatelessWidget {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Colors.white.withValues(alpha: 0.95),
               title: const Text('Delete expense?'),
               content: const Text('This action cannot be undone.'),
               actions: [
@@ -213,6 +216,7 @@ class _VehicleDetailView extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
+              backgroundColor: Colors.white.withValues(alpha: 0.95),
               title: const Text('Edit expense'),
               content: SingleChildScrollView(
                 child: Form(
@@ -387,86 +391,86 @@ class _VehicleDetailView extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocConsumer<VehicleDetailCubit, VehicleDetailState>(
-        listener: (context, state) {
-          if (state.status == VehicleDetailStatus.failure &&
-              state.errorMessage != null) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
-          }
+      body: LiquidBackdrop(
+        child: BlocConsumer<VehicleDetailCubit, VehicleDetailState>(
+          listener: (context, state) {
+            if (state.status == VehicleDetailStatus.failure &&
+                state.errorMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+            }
 
-          if (state.actionMessage != null &&
-              state.actionStatus != VehicleExpenseActionStatus.idle) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.actionMessage!)));
-          }
+            if (state.actionMessage != null &&
+                state.actionStatus != VehicleExpenseActionStatus.idle) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.actionMessage!)));
+            }
 
-          if (state.reminderActionMessage != null &&
-              state.reminderActionStatus != VehicleReminderActionStatus.idle) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.reminderActionMessage!)),
-            );
-          }
-        },
-        builder: (context, state) {
-          final preferences = context.select(
-            (SettingsCubit cubit) => cubit.state.preferences,
-          );
-          final distanceUnit = preferences.distanceUnit;
-          final reminderSnapshot = context
-              .read<ReminderComputationService>()
-              .vehicleReminders(
-                vehicle: state.vehicle,
-                expenses: state.expenses,
-                preferences: preferences,
+            if (state.reminderActionMessage != null &&
+                state.reminderActionStatus !=
+                    VehicleReminderActionStatus.idle) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.reminderActionMessage!)),
               );
-
-          final sortedExpenses = List<Expense>.from(state.expenses)
-            ..sort((a, b) => b.date.compareTo(a.date));
-
-          final totalSpent = sortedExpenses.fold<double>(
-            0,
-            (sum, item) => sum + item.amount,
-          );
-          final fuelSpent = sortedExpenses
-              .where((expense) => expense.category == ExpenseCategory.fuel)
-              .fold<double>(0, (sum, item) => sum + item.amount);
-          final maintenanceSpent = sortedExpenses
-              .where(
-                (expense) => {
-                  ExpenseCategory.service,
-                  ExpenseCategory.repairs,
-                  ExpenseCategory.tires,
-                  ExpenseCategory.carWash,
-                }.contains(expense.category),
-              )
-              .fold<double>(0, (sum, item) => sum + item.amount);
-
-          final categoryTotals = <ExpenseCategory, double>{};
-          for (final expense in sortedExpenses) {
-            categoryTotals.update(
-              expense.category,
-              (value) => value + expense.amount,
-              ifAbsent: () => expense.amount,
+            }
+          },
+          builder: (context, state) {
+            final preferences = context.select(
+              (SettingsCubit cubit) => cubit.state.preferences,
             );
-          }
-          final topCategoryEntry = categoryTotals.entries.isEmpty
-              ? null
-              : (categoryTotals.entries.toList()
-                      ..sort((a, b) => b.value.compareTo(a.value)))
-                    .first;
+            final distanceUnit = preferences.distanceUnit;
+            final reminderSnapshot = context
+                .read<ReminderComputationService>()
+                .vehicleReminders(
+                  vehicle: state.vehicle,
+                  expenses: state.expenses,
+                  preferences: preferences,
+                );
 
-          return RefreshIndicator(
-            onRefresh: () =>
-                context.read<VehicleDetailCubit>().loadExpenses(vehicle.id),
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+            final sortedExpenses = List<Expense>.from(state.expenses)
+              ..sort((a, b) => b.date.compareTo(a.date));
+
+            final totalSpent = sortedExpenses.fold<double>(
+              0,
+              (sum, item) => sum + item.amount,
+            );
+            final fuelSpent = sortedExpenses
+                .where((expense) => expense.category == ExpenseCategory.fuel)
+                .fold<double>(0, (sum, item) => sum + item.amount);
+            final maintenanceSpent = sortedExpenses
+                .where(
+                  (expense) => {
+                    ExpenseCategory.service,
+                    ExpenseCategory.repairs,
+                    ExpenseCategory.tires,
+                    ExpenseCategory.carWash,
+                  }.contains(expense.category),
+                )
+                .fold<double>(0, (sum, item) => sum + item.amount);
+
+            final categoryTotals = <ExpenseCategory, double>{};
+            for (final expense in sortedExpenses) {
+              categoryTotals.update(
+                expense.category,
+                (value) => value + expense.amount,
+                ifAbsent: () => expense.amount,
+              );
+            }
+            final topCategoryEntry = categoryTotals.entries.isEmpty
+                ? null
+                : (categoryTotals.entries.toList()
+                        ..sort((a, b) => b.value.compareTo(a.value)))
+                      .first;
+
+            return RefreshIndicator(
+              onRefresh: () =>
+                  context.read<VehicleDetailCubit>().loadExpenses(vehicle.id),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+                children: [
+                  LiquidGlassCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -492,29 +496,27 @@ class _VehicleDetailView extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                _ReminderStatusCard(
-                  snapshot: reminderSnapshot,
-                  distanceUnit: distanceUnit,
-                  onMarkDone: (type) =>
-                      context.read<VehicleDetailCubit>().markReminderDone(type),
-                  onSnooze: (type) =>
-                      context.read<VehicleDetailCubit>().snoozeReminder(type),
-                  onReschedule: (type) => _rescheduleReminder(
-                    context,
-                    type: type,
-                    distanceUnit: distanceUnit,
+                  const SizedBox(height: 12),
+                  _ReminderStatusCard(
                     snapshot: reminderSnapshot,
+                    distanceUnit: distanceUnit,
+                    onMarkDone: (type) => context
+                        .read<VehicleDetailCubit>()
+                        .markReminderDone(type),
+                    onSnooze: (type) =>
+                        context.read<VehicleDetailCubit>().snoozeReminder(type),
+                    onReschedule: (type) => _rescheduleReminder(
+                      context,
+                      type: type,
+                      distanceUnit: distanceUnit,
+                      snapshot: reminderSnapshot,
+                    ),
+                    isProcessing:
+                        state.reminderActionStatus ==
+                        VehicleReminderActionStatus.processing,
                   ),
-                  isProcessing:
-                      state.reminderActionStatus ==
-                      VehicleReminderActionStatus.processing,
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+                  const SizedBox(height: 12),
+                  LiquidGlassCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -537,82 +539,95 @@ class _VehicleDetailView extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Expense history',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                if (state.status == VehicleDetailStatus.loading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (sortedExpenses.isEmpty)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        'No expenses logged for this vehicle yet.',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  )
-                else ...[
-                  if (state.actionStatus ==
-                      VehicleExpenseActionStatus.processing)
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 8),
-                      child: LinearProgressIndicator(),
-                    ),
-                  ...sortedExpenses.map(
-                    (expense) => Card(
-                      child: ListTile(
-                        title: Text(expense.category.label),
-                        subtitle: Text(
-                          [
-                            Formatters.date(expense.date),
-                            if (expense.vendor != null &&
-                                expense.vendor!.trim().isNotEmpty)
-                              expense.vendor!.trim(),
-                            if (expense.odometer != null)
-                              '${Formatters.number(distanceUnit.fromKilometers(expense.odometer!))} ${distanceUnit.shortLabel}',
-                          ].join(' - '),
+                  const SizedBox(height: 16),
+                  LiquidGlassCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Expense history',
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              Formatters.currency(
-                                expense.amount,
-                                currencyCode: preferences.currencyCode,
-                                currencySymbol: preferences.currencySymbol,
+                        const SizedBox(height: 8),
+                        if (state.status == VehicleDetailStatus.loading)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        else if (sortedExpenses.isEmpty)
+                          Text(
+                            'No expenses logged for this vehicle yet.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          )
+                        else ...[
+                          if (state.actionStatus ==
+                              VehicleExpenseActionStatus.processing)
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 8),
+                              child: LinearProgressIndicator(),
+                            ),
+                          ...sortedExpenses.map(
+                            (expense) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: LiquidInsetCard(
+                                child: ListTile(
+                                  title: Text(expense.category.label),
+                                  subtitle: Text(
+                                    [
+                                      Formatters.date(expense.date),
+                                      if (expense.vendor != null &&
+                                          expense.vendor!.trim().isNotEmpty)
+                                        expense.vendor!.trim(),
+                                      if (expense.odometer != null)
+                                        '${Formatters.number(distanceUnit.fromKilometers(expense.odometer!))} ${distanceUnit.shortLabel}',
+                                    ].join(' - '),
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        Formatters.currency(
+                                          expense.amount,
+                                          currencyCode:
+                                              preferences.currencyCode,
+                                          currencySymbol:
+                                              preferences.currencySymbol,
+                                        ),
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleSmall,
+                                      ),
+                                      IconButton(
+                                        tooltip: 'Edit expense',
+                                        onPressed: () => _openEditExpenseDialog(
+                                          context,
+                                          expense,
+                                        ),
+                                        icon: const Icon(Icons.edit_outlined),
+                                      ),
+                                      IconButton(
+                                        tooltip: 'Delete expense',
+                                        onPressed: () => _confirmDeleteExpense(
+                                          context,
+                                          expense,
+                                        ),
+                                        icon: const Icon(Icons.delete_outline),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              style: Theme.of(context).textTheme.titleSmall,
                             ),
-                            IconButton(
-                              tooltip: 'Edit expense',
-                              onPressed: () =>
-                                  _openEditExpenseDialog(context, expense),
-                              icon: const Icon(Icons.edit_outlined),
-                            ),
-                            IconButton(
-                              tooltip: 'Delete expense',
-                              onPressed: () =>
-                                  _confirmDeleteExpense(context, expense),
-                              icon: const Icon(Icons.delete_outline),
-                            ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],
-              ],
-            ),
-          );
-        },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -640,51 +655,48 @@ class _ReminderStatusCard extends StatelessWidget {
     final serviceDue = snapshot.service ?? snapshot.serviceNextDue;
     final licenseDue = snapshot.license ?? snapshot.licenseNextDue;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Reminders', style: Theme.of(context).textTheme.titleMedium),
+    return LiquidGlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Reminders', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          if (isProcessing) ...[
+            const LinearProgressIndicator(),
             const SizedBox(height: 8),
-            if (isProcessing) ...[
-              const LinearProgressIndicator(),
-              const SizedBox(height: 8),
-            ],
-            _ReminderActionRow(
-              title: _serviceLabel(
-                serviceDue,
-                isInWindow: snapshot.service != null,
-              ),
-              onMarkDone: serviceDue == null
-                  ? null
-                  : () => onMarkDone(ReminderType.service),
-              onSnooze: serviceDue == null
-                  ? null
-                  : () => onSnooze(ReminderType.service),
-              onReschedule: serviceDue == null
-                  ? null
-                  : () => onReschedule(ReminderType.service),
-            ),
-            const SizedBox(height: 8),
-            _ReminderActionRow(
-              title: _licenseLabel(
-                licenseDue,
-                isInWindow: snapshot.license != null,
-              ),
-              onMarkDone: licenseDue == null
-                  ? null
-                  : () => onMarkDone(ReminderType.license),
-              onSnooze: licenseDue == null
-                  ? null
-                  : () => onSnooze(ReminderType.license),
-              onReschedule: licenseDue == null
-                  ? null
-                  : () => onReschedule(ReminderType.license),
-            ),
           ],
-        ),
+          _ReminderActionRow(
+            title: _serviceLabel(
+              serviceDue,
+              isInWindow: snapshot.service != null,
+            ),
+            onMarkDone: serviceDue == null
+                ? null
+                : () => onMarkDone(ReminderType.service),
+            onSnooze: serviceDue == null
+                ? null
+                : () => onSnooze(ReminderType.service),
+            onReschedule: serviceDue == null
+                ? null
+                : () => onReschedule(ReminderType.service),
+          ),
+          const SizedBox(height: 8),
+          _ReminderActionRow(
+            title: _licenseLabel(
+              licenseDue,
+              isInWindow: snapshot.license != null,
+            ),
+            onMarkDone: licenseDue == null
+                ? null
+                : () => onMarkDone(ReminderType.license),
+            onSnooze: licenseDue == null
+                ? null
+                : () => onSnooze(ReminderType.license),
+            onReschedule: licenseDue == null
+                ? null
+                : () => onReschedule(ReminderType.license),
+          ),
+        ],
       ),
     );
   }

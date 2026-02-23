@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/formatting/formatters.dart';
+import '../../../core/presentation/liquid_glass.dart';
 import '../../expenses/domain/expense_repository.dart';
 import '../../expenses/presentation/add_expense_page.dart';
 import '../../settings/domain/app_preferences.dart';
@@ -81,14 +80,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return BlocBuilder<VehicleCubit, VehicleState>(
       builder: (context, state) {
         final vehicles = state.vehicles;
-        return DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFE2F3EF), Color(0xFFF3F8FF), Color(0xFFF6F5FF)],
-            ),
-          ),
+        return LiquidBackdrop(
           child: RefreshIndicator(
             onRefresh: _refreshSnapshot,
             child: ListView(
@@ -150,7 +142,7 @@ class _HeroPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassPanel(
+    return LiquidGlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -179,7 +171,7 @@ class _ActionPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassPanel(
+    return LiquidGlassCard(
       child: Wrap(
         spacing: 10,
         runSpacing: 10,
@@ -227,7 +219,7 @@ class _MetricsPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const _GlassPanel(
+      return const LiquidGlassCard(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 18),
           child: Center(child: CircularProgressIndicator()),
@@ -263,11 +255,14 @@ class _MetricsPanel extends StatelessWidget {
       ),
     ];
 
-    return _GlassPanel(
+    return LiquidGlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Quick overview', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'Quick overview',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 12),
           GridView.builder(
             shrinkWrap: true,
@@ -279,10 +274,8 @@ class _MetricsPanel extends StatelessWidget {
               mainAxisSpacing: 10,
               childAspectRatio: 2.2,
             ),
-            itemBuilder: (context, index) => _MetricTile(
-              label: metrics[index].$1,
-              value: metrics[index].$2,
-            ),
+            itemBuilder: (context, index) =>
+                _MetricTile(label: metrics[index].$1, value: metrics[index].$2),
           ),
         ],
       ),
@@ -298,27 +291,19 @@ class _MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.white.withOpacity(0.64),
-        border: Border.all(color: Colors.white.withOpacity(0.7)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: Theme.of(context).textTheme.labelLarge),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ],
-        ),
+    return LiquidInsetCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ],
       ),
     );
   }
@@ -337,7 +322,7 @@ class _VehicleSnapshotPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassPanel(
+    return LiquidGlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -362,75 +347,27 @@ class _VehicleSnapshotPanel extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             )
           else
-            ...vehicles.take(4).map(
-              (vehicle) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withOpacity(0.7),
-                        Colors.white.withOpacity(0.52),
-                      ],
+            ...vehicles
+                .take(4)
+                .map(
+                  (vehicle) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: LiquidInsetCard(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.directions_car_filled_outlined,
+                        ),
+                        title: Text(vehicle.displayName),
+                        subtitle: Text(
+                          '${vehicle.registrationNumber} • ${Formatters.number(vehicle.initialMileage)} $distanceUnitLabel',
+                        ),
+                        trailing: Text('${vehicle.year}'),
+                        onTap: onOpenVehicles,
+                      ),
                     ),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.75),
-                    ),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.directions_car_filled_outlined),
-                    title: Text(vehicle.displayName),
-                    subtitle: Text(
-                      '${vehicle.registrationNumber} • ${Formatters.number(vehicle.initialMileage)} $distanceUnitLabel',
-                    ),
-                    trailing: Text('${vehicle.year}'),
-                    onTap: onOpenVehicles,
                   ),
                 ),
-              ),
-            ),
         ],
-      ),
-    );
-  }
-}
-
-class _GlassPanel extends StatelessWidget {
-  const _GlassPanel({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.72)),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.66),
-                Colors.white.withOpacity(0.42),
-              ],
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x22000000),
-                blurRadius: 16,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Padding(padding: const EdgeInsets.all(16), child: child),
-        ),
       ),
     );
   }
