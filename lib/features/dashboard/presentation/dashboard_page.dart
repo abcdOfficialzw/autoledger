@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/formatting/formatters.dart';
 import '../../expenses/domain/expense_repository.dart';
+import '../../settings/domain/app_preferences.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../../shell/presentation/navigation_cubit.dart';
 import '../../vehicles/domain/vehicle.dart';
@@ -30,16 +31,18 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _refreshSnapshot() async {
+    final vehicleCubit = context.read<VehicleCubit>();
     setState(() {
       _metricsFuture = _loadMetrics();
     });
-    await context.read<VehicleCubit>().loadVehicles();
+    await vehicleCubit.loadVehicles();
     await _metricsFuture;
   }
 
   Future<_DashboardMetrics> _loadMetrics() async {
-    final vehicles = await context.read<VehicleRepository>().getVehicles();
+    final vehicleRepository = context.read<VehicleRepository>();
     final expenseRepository = context.read<ExpenseRepository>();
+    final vehicles = await vehicleRepository.getVehicles();
     final allExpenses = await expenseRepository.getAllExpenses();
     final now = DateTime.now();
     final monthStart = DateTime(now.year, now.month, 1);
