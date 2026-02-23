@@ -10,6 +10,7 @@ import 'features/expenses/data/services/local_csv_export_service.dart';
 import 'features/expenses/domain/expense_repository.dart';
 import 'features/expenses/domain/services/csv_export_service.dart';
 import 'features/expenses/presentation/cubit/add_expense_cubit.dart';
+import 'features/reminders/domain/services/reminder_computation_service.dart';
 import 'features/settings/data/local_settings_repository.dart';
 import 'features/settings/domain/settings_repository.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
@@ -64,6 +65,9 @@ class AutoLedgerApp extends StatelessWidget {
           create: (_) => resolvedExpenseRepository,
         ),
         RepositoryProvider<CsvExportService>(create: (_) => csvExportService),
+        RepositoryProvider<ReminderComputationService>(
+          create: (_) => const ReminderComputationService(),
+        ),
         RepositoryProvider<SettingsRepository>(
           create: (_) => settingsRepository,
         ),

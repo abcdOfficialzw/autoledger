@@ -6,6 +6,8 @@ import '../../expenses/domain/expense.dart';
 import '../../expenses/domain/expense_category.dart';
 import '../../expenses/domain/expense_repository.dart';
 import '../../expenses/domain/services/csv_export_service.dart';
+import '../../reminders/domain/reminder_candidate.dart';
+import '../../reminders/domain/services/reminder_computation_service.dart';
 import '../../settings/domain/app_preferences.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../domain/vehicle.dart';
@@ -305,6 +307,13 @@ class _VehicleDetailView extends StatelessWidget {
             (SettingsCubit cubit) => cubit.state.preferences,
           );
           final distanceUnit = preferences.distanceUnit;
+          final reminderSnapshot = context
+              .read<ReminderComputationService>()
+              .vehicleReminders(
+                vehicle: vehicle,
+                expenses: state.expenses,
+                preferences: preferences,
+              );
 
           final sortedExpenses = List<Expense>.from(state.expenses)
             ..sort((a, b) => b.date.compareTo(a.date));
@@ -375,6 +384,11 @@ class _VehicleDetailView extends StatelessWidget {
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 8),
+                _ReminderStatusCard(
+                  snapshot: reminderSnapshot,
+                  distanceUnit: distanceUnit,
                 ),
                 const SizedBox(height: 8),
                 Card(
@@ -480,5 +494,70 @@ class _VehicleDetailView extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _ReminderStatusCard extends StatelessWidget {
+  const _ReminderStatusCard({
+    required this.snapshot,
+    required this.distanceUnit,
+  });
+
+  final VehicleReminderSnapshot snapshot;
+  final DistanceUnit distanceUnit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Reminders', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Text(_serviceLabel(snapshot.service)),
+            const SizedBox(height: 4),
+            Text(_licenseLabel(snapshot.license)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _serviceLabel(ReminderCandidate? service) {
+    if (service == null) {
+      return 'Service: no upcoming reminder.';
+    }
+
+    final remaining = service.remainingDistanceKm ?? 0;
+    final remainingInUnit = distanceUnit.fromKilometers(remaining.abs());
+    final dueMileage = service.dueMileage == null
+        ? null
+        : distanceUnit.fromKilometers(service.dueMileage!);
+    final status = service.urgency == ReminderUrgency.overdue
+        ? 'overdue by'
+        : 'due in';
+    final dueMileageText = dueMileage == null
+        ? ''
+        : ' (target ${Formatters.number(dueMileage)} ${distanceUnit.shortLabel})';
+
+    return 'Service: $status ${Formatters.number(remainingInUnit)} ${distanceUnit.shortLabel}$dueMileageText';
+  }
+
+  String _licenseLabel(ReminderCandidate? license) {
+    if (license == null) {
+      return 'License: no upcoming reminder.';
+    }
+
+    final remaining = (license.remainingDays ?? 0).abs();
+    final status = license.urgency == ReminderUrgency.overdue
+        ? 'expired'
+        : 'expires in';
+    final dueDateText = license.dueDate == null
+        ? ''
+        : ' (${Formatters.date(license.dueDate!)})';
+
+    return 'License: $status $remaining day(s)$dueDateText';
   }
 }

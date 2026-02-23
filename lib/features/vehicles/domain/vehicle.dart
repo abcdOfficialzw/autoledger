@@ -11,6 +11,10 @@ class Vehicle extends Equatable {
     required this.purchasePrice,
     required this.initialMileage,
     this.nickname,
+    this.serviceIntervalKm,
+    this.lastServiceMileage,
+    this.lastServiceDate,
+    this.licenseExpiryDate,
   });
 
   final int id;
@@ -22,6 +26,10 @@ class Vehicle extends Equatable {
   final double purchasePrice;
   final int initialMileage;
   final String? nickname;
+  final int? serviceIntervalKm;
+  final int? lastServiceMileage;
+  final DateTime? lastServiceDate;
+  final DateTime? licenseExpiryDate;
 
   String get displayName {
     final nick = nickname?.trim();
@@ -42,5 +50,9 @@ class Vehicle extends Equatable {
     purchasePrice,
     initialMileage,
     nickname,
+    serviceIntervalKm,
+    lastServiceMileage,
+    lastServiceDate,
+    licenseExpiryDate,
   ];
 }

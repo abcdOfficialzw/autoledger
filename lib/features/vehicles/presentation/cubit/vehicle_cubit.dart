@@ -39,6 +39,10 @@ class VehicleCubit extends Cubit<VehicleState> {
     required double purchasePrice,
     required int initialMileage,
     String? nickname,
+    int? serviceIntervalKm,
+    int? lastServiceMileage,
+    DateTime? lastServiceDate,
+    DateTime? licenseExpiryDate,
   }) async {
     try {
       await _vehicleRepository.createVehicle(
@@ -50,6 +54,10 @@ class VehicleCubit extends Cubit<VehicleState> {
         purchasePrice: purchasePrice,
         initialMileage: initialMileage,
         nickname: nickname,
+        serviceIntervalKm: serviceIntervalKm,
+        lastServiceMileage: lastServiceMileage,
+        lastServiceDate: lastServiceDate,
+        licenseExpiryDate: licenseExpiryDate,
       );
       await loadVehicles();
     } catch (_) {

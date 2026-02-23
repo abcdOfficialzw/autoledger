@@ -63,6 +63,12 @@ class ReportsState extends Equatable {
     this.monthlyTrend = const [],
     this.costPerKmBaseline,
     this.baselineVehicleCount = 0,
+    this.reminderUpcomingCount = 0,
+    this.reminderOverdueCount = 0,
+    this.serviceReminderUpcomingCount = 0,
+    this.serviceReminderOverdueCount = 0,
+    this.licenseReminderUpcomingCount = 0,
+    this.licenseReminderOverdueCount = 0,
     this.errorMessage,
   });
 
@@ -79,6 +85,12 @@ class ReportsState extends Equatable {
   final List<MonthlySpend> monthlyTrend;
   final double? costPerKmBaseline;
   final int baselineVehicleCount;
+  final int reminderUpcomingCount;
+  final int reminderOverdueCount;
+  final int serviceReminderUpcomingCount;
+  final int serviceReminderOverdueCount;
+  final int licenseReminderUpcomingCount;
+  final int licenseReminderOverdueCount;
   final String? errorMessage;
 
   ReportsState copyWith({
@@ -100,6 +112,12 @@ class ReportsState extends Equatable {
     double? costPerKmBaseline,
     bool clearCostPerKmBaseline = false,
     int? baselineVehicleCount,
+    int? reminderUpcomingCount,
+    int? reminderOverdueCount,
+    int? serviceReminderUpcomingCount,
+    int? serviceReminderOverdueCount,
+    int? licenseReminderUpcomingCount,
+    int? licenseReminderOverdueCount,
     String? errorMessage,
   }) {
     return ReportsState(
@@ -118,6 +136,17 @@ class ReportsState extends Equatable {
           ? null
           : (costPerKmBaseline ?? this.costPerKmBaseline),
       baselineVehicleCount: baselineVehicleCount ?? this.baselineVehicleCount,
+      reminderUpcomingCount:
+          reminderUpcomingCount ?? this.reminderUpcomingCount,
+      reminderOverdueCount: reminderOverdueCount ?? this.reminderOverdueCount,
+      serviceReminderUpcomingCount:
+          serviceReminderUpcomingCount ?? this.serviceReminderUpcomingCount,
+      serviceReminderOverdueCount:
+          serviceReminderOverdueCount ?? this.serviceReminderOverdueCount,
+      licenseReminderUpcomingCount:
+          licenseReminderUpcomingCount ?? this.licenseReminderUpcomingCount,
+      licenseReminderOverdueCount:
+          licenseReminderOverdueCount ?? this.licenseReminderOverdueCount,
       errorMessage: errorMessage,
     );
   }
@@ -137,6 +166,12 @@ class ReportsState extends Equatable {
     monthlyTrend,
     costPerKmBaseline,
     baselineVehicleCount,
+    reminderUpcomingCount,
+    reminderOverdueCount,
+    serviceReminderUpcomingCount,
+    serviceReminderOverdueCount,
+    licenseReminderUpcomingCount,
+    licenseReminderOverdueCount,
     errorMessage,
   ];
 }

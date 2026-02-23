@@ -12,6 +12,10 @@ abstract class VehicleRepository {
     required double purchasePrice,
     required int initialMileage,
     String? nickname,
+    int? serviceIntervalKm,
+    int? lastServiceMileage,
+    DateTime? lastServiceDate,
+    DateTime? licenseExpiryDate,
   });
 
   Future<void> updateVehicle(Vehicle vehicle);

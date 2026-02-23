@@ -19,6 +19,10 @@ class VehicleIsar {
   double purchasePrice = 0;
   int initialMileage = 0;
   String? nickname;
+  int? serviceIntervalKm;
+  int? lastServiceMileage;
+  DateTime? lastServiceDate;
+  DateTime? licenseExpiryDate;
 }
 
 extension VehicleIsarMapper on VehicleIsar {
@@ -33,6 +37,10 @@ extension VehicleIsarMapper on VehicleIsar {
       purchasePrice: purchasePrice,
       initialMileage: initialMileage,
       nickname: nickname,
+      serviceIntervalKm: serviceIntervalKm,
+      lastServiceMileage: lastServiceMileage,
+      lastServiceDate: lastServiceDate,
+      licenseExpiryDate: licenseExpiryDate,
     );
   }
 }
@@ -48,6 +56,10 @@ extension VehicleMapper on Vehicle {
       ..purchaseDate = purchaseDate
       ..purchasePrice = purchasePrice
       ..initialMileage = initialMileage
-      ..nickname = nickname;
+      ..nickname = nickname
+      ..serviceIntervalKm = serviceIntervalKm
+      ..lastServiceMileage = lastServiceMileage
+      ..lastServiceDate = lastServiceDate
+      ..licenseExpiryDate = licenseExpiryDate;
   }
 }

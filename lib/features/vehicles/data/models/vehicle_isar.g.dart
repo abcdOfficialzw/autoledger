@@ -22,38 +22,58 @@ const VehicleIsarSchema = CollectionSchema(
       name: r'initialMileage',
       type: IsarType.long,
     ),
-    r'make': PropertySchema(
+    r'lastServiceDate': PropertySchema(
       id: 1,
+      name: r'lastServiceDate',
+      type: IsarType.dateTime,
+    ),
+    r'lastServiceMileage': PropertySchema(
+      id: 2,
+      name: r'lastServiceMileage',
+      type: IsarType.long,
+    ),
+    r'licenseExpiryDate': PropertySchema(
+      id: 3,
+      name: r'licenseExpiryDate',
+      type: IsarType.dateTime,
+    ),
+    r'make': PropertySchema(
+      id: 4,
       name: r'make',
       type: IsarType.string,
     ),
     r'model': PropertySchema(
-      id: 2,
+      id: 5,
       name: r'model',
       type: IsarType.string,
     ),
     r'nickname': PropertySchema(
-      id: 3,
+      id: 6,
       name: r'nickname',
       type: IsarType.string,
     ),
     r'purchaseDate': PropertySchema(
-      id: 4,
+      id: 7,
       name: r'purchaseDate',
       type: IsarType.dateTime,
     ),
     r'purchasePrice': PropertySchema(
-      id: 5,
+      id: 8,
       name: r'purchasePrice',
       type: IsarType.double,
     ),
     r'registrationNumber': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'registrationNumber',
       type: IsarType.string,
     ),
+    r'serviceIntervalKm': PropertySchema(
+      id: 10,
+      name: r'serviceIntervalKm',
+      type: IsarType.long,
+    ),
     r'year': PropertySchema(
-      id: 7,
+      id: 11,
       name: r'year',
       type: IsarType.long,
     )
@@ -111,13 +131,17 @@ void _vehicleIsarSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLong(offsets[0], object.initialMileage);
-  writer.writeString(offsets[1], object.make);
-  writer.writeString(offsets[2], object.model);
-  writer.writeString(offsets[3], object.nickname);
-  writer.writeDateTime(offsets[4], object.purchaseDate);
-  writer.writeDouble(offsets[5], object.purchasePrice);
-  writer.writeString(offsets[6], object.registrationNumber);
-  writer.writeLong(offsets[7], object.year);
+  writer.writeDateTime(offsets[1], object.lastServiceDate);
+  writer.writeLong(offsets[2], object.lastServiceMileage);
+  writer.writeDateTime(offsets[3], object.licenseExpiryDate);
+  writer.writeString(offsets[4], object.make);
+  writer.writeString(offsets[5], object.model);
+  writer.writeString(offsets[6], object.nickname);
+  writer.writeDateTime(offsets[7], object.purchaseDate);
+  writer.writeDouble(offsets[8], object.purchasePrice);
+  writer.writeString(offsets[9], object.registrationNumber);
+  writer.writeLong(offsets[10], object.serviceIntervalKm);
+  writer.writeLong(offsets[11], object.year);
 }
 
 VehicleIsar _vehicleIsarDeserialize(
@@ -129,13 +153,17 @@ VehicleIsar _vehicleIsarDeserialize(
   final object = VehicleIsar();
   object.id = id;
   object.initialMileage = reader.readLong(offsets[0]);
-  object.make = reader.readString(offsets[1]);
-  object.model = reader.readString(offsets[2]);
-  object.nickname = reader.readStringOrNull(offsets[3]);
-  object.purchaseDate = reader.readDateTime(offsets[4]);
-  object.purchasePrice = reader.readDouble(offsets[5]);
-  object.registrationNumber = reader.readString(offsets[6]);
-  object.year = reader.readLong(offsets[7]);
+  object.lastServiceDate = reader.readDateTimeOrNull(offsets[1]);
+  object.lastServiceMileage = reader.readLongOrNull(offsets[2]);
+  object.licenseExpiryDate = reader.readDateTimeOrNull(offsets[3]);
+  object.make = reader.readString(offsets[4]);
+  object.model = reader.readString(offsets[5]);
+  object.nickname = reader.readStringOrNull(offsets[6]);
+  object.purchaseDate = reader.readDateTime(offsets[7]);
+  object.purchasePrice = reader.readDouble(offsets[8]);
+  object.registrationNumber = reader.readString(offsets[9]);
+  object.serviceIntervalKm = reader.readLongOrNull(offsets[10]);
+  object.year = reader.readLong(offsets[11]);
   return object;
 }
 
@@ -149,18 +177,26 @@ P _vehicleIsarDeserializeProp<P>(
     case 0:
       return (reader.readLong(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
-      return (reader.readDateTime(offset)) as P;
-    case 5:
-      return (reader.readDouble(offset)) as P;
-    case 6:
       return (reader.readString(offset)) as P;
+    case 5:
+      return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readStringOrNull(offset)) as P;
     case 7:
+      return (reader.readDateTime(offset)) as P;
+    case 8:
+      return (reader.readDouble(offset)) as P;
+    case 9:
+      return (reader.readString(offset)) as P;
+    case 10:
+      return (reader.readLongOrNull(offset)) as P;
+    case 11:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -465,6 +501,228 @@ extension VehicleIsarQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'initialMileage',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'lastServiceDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'lastServiceDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastServiceDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastServiceDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastServiceDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastServiceDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceMileageIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'lastServiceMileage',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceMileageIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'lastServiceMileage',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceMileageEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastServiceMileage',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceMileageGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastServiceMileage',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceMileageLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastServiceMileage',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      lastServiceMileageBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastServiceMileage',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseExpiryDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'licenseExpiryDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseExpiryDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'licenseExpiryDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseExpiryDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'licenseExpiryDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseExpiryDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'licenseExpiryDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseExpiryDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'licenseExpiryDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseExpiryDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'licenseExpiryDate',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -1147,6 +1405,80 @@ extension VehicleIsarQueryFilter
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceIntervalKmIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'serviceIntervalKm',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceIntervalKmIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'serviceIntervalKm',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceIntervalKmEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serviceIntervalKm',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceIntervalKmGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serviceIntervalKm',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceIntervalKmLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serviceIntervalKm',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceIntervalKmBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serviceIntervalKm',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition> yearEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
@@ -1219,6 +1551,47 @@ extension VehicleIsarQuerySortBy
       sortByInitialMileageDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'initialMileage', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy> sortByLastServiceDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLastServiceDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLastServiceMileage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceMileage', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLastServiceMileageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceMileage', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseExpiryDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseExpiryDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseExpiryDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseExpiryDate', Sort.desc);
     });
   }
 
@@ -1298,6 +1671,20 @@ extension VehicleIsarQuerySortBy
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceIntervalKm() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceIntervalKm', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceIntervalKmDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceIntervalKm', Sort.desc);
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy> sortByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'year', Sort.asc);
@@ -1335,6 +1722,47 @@ extension VehicleIsarQuerySortThenBy
       thenByInitialMileageDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'initialMileage', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy> thenByLastServiceDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLastServiceDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLastServiceMileage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceMileage', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLastServiceMileageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastServiceMileage', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseExpiryDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseExpiryDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseExpiryDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseExpiryDate', Sort.desc);
     });
   }
 
@@ -1414,6 +1842,20 @@ extension VehicleIsarQuerySortThenBy
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceIntervalKm() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceIntervalKm', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceIntervalKmDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceIntervalKm', Sort.desc);
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy> thenByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'year', Sort.asc);
@@ -1432,6 +1874,27 @@ extension VehicleIsarQueryWhereDistinct
   QueryBuilder<VehicleIsar, VehicleIsar, QDistinct> distinctByInitialMileage() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'initialMileage');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByLastServiceDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastServiceDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByLastServiceMileage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastServiceMileage');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByLicenseExpiryDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'licenseExpiryDate');
     });
   }
 
@@ -1476,6 +1939,13 @@ extension VehicleIsarQueryWhereDistinct
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByServiceIntervalKm() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serviceIntervalKm');
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QDistinct> distinctByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'year');
@@ -1494,6 +1964,27 @@ extension VehicleIsarQueryProperty
   QueryBuilder<VehicleIsar, int, QQueryOperations> initialMileageProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'initialMileage');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      lastServiceDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastServiceDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, int?, QQueryOperations>
+      lastServiceMileageProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastServiceMileage');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      licenseExpiryDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'licenseExpiryDate');
     });
   }
 
@@ -1531,6 +2022,13 @@ extension VehicleIsarQueryProperty
       registrationNumberProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'registrationNumber');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, int?, QQueryOperations>
+      serviceIntervalKmProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serviceIntervalKm');
     });
   }
 

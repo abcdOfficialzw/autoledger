@@ -12,6 +12,10 @@ class VehicleFormResult {
     required this.purchasePrice,
     required this.initialMileage,
     this.nickname,
+    this.serviceIntervalKm,
+    this.lastServiceMileage,
+    this.lastServiceDate,
+    this.licenseExpiryDate,
   });
 
   final String make;
@@ -22,6 +26,10 @@ class VehicleFormResult {
   final double purchasePrice;
   final int initialMileage;
   final String? nickname;
+  final int? serviceIntervalKm;
+  final int? lastServiceMileage;
+  final DateTime? lastServiceDate;
+  final DateTime? licenseExpiryDate;
 }
 
 class VehicleFormPage extends StatefulWidget {
@@ -43,7 +51,11 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
   late final TextEditingController _regController;
   late final TextEditingController _purchasePriceController;
   late final TextEditingController _initialMileageController;
+  late final TextEditingController _serviceIntervalController;
+  late final TextEditingController _lastServiceMileageController;
   late DateTime _purchaseDate;
+  DateTime? _lastServiceDate;
+  DateTime? _licenseExpiryDate;
 
   bool get _isEdit => widget.initialVehicle != null;
 
@@ -67,7 +79,15 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
     _initialMileageController = TextEditingController(
       text: vehicle?.initialMileage.toString() ?? '',
     );
+    _serviceIntervalController = TextEditingController(
+      text: vehicle?.serviceIntervalKm?.toString() ?? '',
+    );
+    _lastServiceMileageController = TextEditingController(
+      text: vehicle?.lastServiceMileage?.toString() ?? '',
+    );
     _purchaseDate = vehicle?.purchaseDate ?? DateTime.now();
+    _lastServiceDate = vehicle?.lastServiceDate;
+    _licenseExpiryDate = vehicle?.licenseExpiryDate;
   }
 
   @override
@@ -79,6 +99,8 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
     _regController.dispose();
     _purchasePriceController.dispose();
     _initialMileageController.dispose();
+    _serviceIntervalController.dispose();
+    _lastServiceMileageController.dispose();
     super.dispose();
   }
 
@@ -104,6 +126,8 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
     final year = int.parse(_yearController.text.trim());
     final purchasePrice = double.parse(_purchasePriceController.text.trim());
     final initialMileage = int.parse(_initialMileageController.text.trim());
+    final serviceIntervalText = _serviceIntervalController.text.trim();
+    final lastServiceMileageText = _lastServiceMileageController.text.trim();
 
     Navigator.of(context).pop(
       VehicleFormResult(
@@ -117,6 +141,14 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
         purchaseDate: _purchaseDate,
         purchasePrice: purchasePrice,
         initialMileage: initialMileage,
+        serviceIntervalKm: serviceIntervalText.isEmpty
+            ? null
+            : int.parse(serviceIntervalText),
+        lastServiceMileage: lastServiceMileageText.isEmpty
+            ? null
+            : int.parse(lastServiceMileageText),
+        lastServiceDate: _lastServiceDate,
+        licenseExpiryDate: _licenseExpiryDate,
       ),
     );
   }
@@ -228,7 +260,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                 TextFormField(
                   controller: _initialMileageController,
                   keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.done,
+                  textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: 'Initial mileage',
                   ),
@@ -242,6 +274,128 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _serviceIntervalController,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Service interval (km, optional)',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return null;
+                    }
+                    final parsed = int.tryParse(value.trim());
+                    if (parsed == null || parsed <= 0) {
+                      return 'Enter a valid interval';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _lastServiceMileageController,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Last service mileage (optional)',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return null;
+                    }
+                    final parsed = int.tryParse(value.trim());
+                    if (parsed == null || parsed < 0) {
+                      return 'Enter a valid mileage';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _lastServiceDate ?? now,
+                      firstDate: DateTime(now.year - 30),
+                      lastDate: DateTime(now.year + 5),
+                    );
+                    if (picked == null) {
+                      return;
+                    }
+                    setState(() => _lastServiceDate = picked);
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Last service date (optional)',
+                      suffixIcon: _lastServiceDate == null
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() => _lastServiceDate = null);
+                              },
+                            ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _lastServiceDate == null
+                              ? 'Not set'
+                              : MaterialLocalizations.of(
+                                  context,
+                                ).formatMediumDate(_lastServiceDate!),
+                        ),
+                        const Icon(Icons.calendar_today_outlined),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _licenseExpiryDate ?? now,
+                      firstDate: DateTime(now.year - 5),
+                      lastDate: DateTime(now.year + 10),
+                    );
+                    if (picked == null) {
+                      return;
+                    }
+                    setState(() => _licenseExpiryDate = picked);
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'License expiry date (optional)',
+                      suffixIcon: _licenseExpiryDate == null
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() => _licenseExpiryDate = null);
+                              },
+                            ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _licenseExpiryDate == null
+                              ? 'Not set'
+                              : MaterialLocalizations.of(
+                                  context,
+                                ).formatMediumDate(_licenseExpiryDate!),
+                        ),
+                        const Icon(Icons.calendar_today_outlined),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 SizedBox(

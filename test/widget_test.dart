@@ -43,6 +43,10 @@ class _FakeVehicleRepository implements VehicleRepository {
     required double purchasePrice,
     required int initialMileage,
     String? nickname,
+    int? serviceIntervalKm,
+    int? lastServiceMileage,
+    DateTime? lastServiceDate,
+    DateTime? licenseExpiryDate,
   }) async {
     final id = _vehicles.length + 1;
     _vehicles.add(
@@ -56,6 +60,10 @@ class _FakeVehicleRepository implements VehicleRepository {
         purchasePrice: purchasePrice,
         initialMileage: initialMileage,
         nickname: nickname,
+        serviceIntervalKm: serviceIntervalKm,
+        lastServiceMileage: lastServiceMileage,
+        lastServiceDate: lastServiceDate,
+        licenseExpiryDate: licenseExpiryDate,
       ),
     );
     return id;

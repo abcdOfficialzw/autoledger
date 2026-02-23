@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/formatting/formatters.dart';
 import '../../expenses/domain/expense_repository.dart';
 import '../../expenses/domain/services/csv_export_service.dart';
+import '../../reminders/domain/services/reminder_computation_service.dart';
 import '../../settings/domain/app_preferences.dart';
+import '../../settings/domain/settings_repository.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../../vehicles/domain/vehicle_repository.dart';
 import 'cubit/reports_cubit.dart';
@@ -19,6 +21,8 @@ class ReportsPage extends StatelessWidget {
       create: (context) => ReportsCubit(
         context.read<VehicleRepository>(),
         context.read<ExpenseRepository>(),
+        context.read<SettingsRepository>(),
+        context.read<ReminderComputationService>(),
       )..load(),
       child: const _ReportsView(),
     );
@@ -213,6 +217,22 @@ class _ReportsViewState extends State<_ReportsView> {
                   value: state.costPerKmBaseline == null
                       ? 'N/A'
                       : '${Formatters.currency(preferences.distanceUnit.fromCostPerKilometer(state.costPerKmBaseline!), currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}/$distanceUnitLabel',
+                ),
+                _SummaryCard(
+                  title: 'Reminder summary',
+                  subtitle: 'Settings-driven service and license candidates.',
+                  value:
+                      '${state.reminderOverdueCount} overdue • ${state.reminderUpcomingCount} upcoming',
+                ),
+                _SummaryCard(
+                  title: 'Service reminders',
+                  value:
+                      '${state.serviceReminderOverdueCount} overdue • ${state.serviceReminderUpcomingCount} upcoming',
+                ),
+                _SummaryCard(
+                  title: 'License reminders',
+                  value:
+                      '${state.licenseReminderOverdueCount} overdue • ${state.licenseReminderUpcomingCount} upcoming',
                 ),
                 const SizedBox(height: 12),
                 Text(

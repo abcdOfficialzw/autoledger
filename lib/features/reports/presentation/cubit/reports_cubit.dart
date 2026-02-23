@@ -3,16 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../expenses/domain/expense.dart';
 import '../../../expenses/domain/expense_category.dart';
 import '../../../expenses/domain/expense_repository.dart';
+import '../../../reminders/domain/services/reminder_computation_service.dart';
+import '../../../settings/domain/settings_repository.dart';
 import '../../../vehicles/domain/vehicle.dart';
 import '../../../vehicles/domain/vehicle_repository.dart';
 import 'reports_state.dart';
 
 class ReportsCubit extends Cubit<ReportsState> {
-  ReportsCubit(this._vehicleRepository, this._expenseRepository)
-    : super(const ReportsState());
+  ReportsCubit(
+    this._vehicleRepository,
+    this._expenseRepository,
+    this._settingsRepository,
+    this._reminderComputationService,
+  ) : super(const ReportsState());
 
   final VehicleRepository _vehicleRepository;
   final ExpenseRepository _expenseRepository;
+  final SettingsRepository _settingsRepository;
+  final ReminderComputationService _reminderComputationService;
 
   Future<void> load() async {
     await _loadForRange(showLoading: true);
@@ -70,6 +78,7 @@ class ReportsCubit extends Cubit<ReportsState> {
     try {
       final vehicles = await _vehicleRepository.getVehicles();
       final bounds = _resolveRangeBounds();
+      final preferences = await _settingsRepository.loadPreferences();
 
       final expensesByVehicle = await Future.wait(
         vehicles.map(
@@ -78,6 +87,11 @@ class ReportsCubit extends Cubit<ReportsState> {
             startDate: bounds.start,
             endDate: bounds.end,
           ),
+        ),
+      );
+      final expensesForReminders = await Future.wait(
+        vehicles.map(
+          (vehicle) => _expenseRepository.getExpensesForVehicle(vehicle.id),
         ),
       );
 
@@ -136,6 +150,14 @@ class ReportsCubit extends Cubit<ReportsState> {
         vehicles: vehicles,
         expensesByVehicle: expensesByVehicle,
       );
+      final reminderSummary = _reminderComputationService.summarize(
+        vehicles: vehicles,
+        expensesByVehicle: {
+          for (var index = 0; index < vehicles.length; index++)
+            vehicles[index].id: expensesForReminders[index],
+        },
+        preferences: preferences,
+      );
 
       emit(
         state.copyWith(
@@ -148,6 +170,12 @@ class ReportsCubit extends Cubit<ReportsState> {
           categoryBreakdown: categoryBreakdown,
           monthlyTrend: monthlyTrend,
           baselineVehicleCount: baseline.vehicleCount,
+          reminderUpcomingCount: reminderSummary.totalUpcoming,
+          reminderOverdueCount: reminderSummary.totalOverdue,
+          serviceReminderUpcomingCount: reminderSummary.serviceUpcoming,
+          serviceReminderOverdueCount: reminderSummary.serviceOverdue,
+          licenseReminderUpcomingCount: reminderSummary.licenseUpcoming,
+          licenseReminderOverdueCount: reminderSummary.licenseOverdue,
           clearCostPerKmBaseline: baseline.costPerKm == null,
           costPerKmBaseline: baseline.costPerKm,
           errorMessage: null,

@@ -43,6 +43,10 @@ class _VehiclesPageState extends State<VehiclesPage> {
       purchasePrice: result.purchasePrice,
       initialMileage: result.initialMileage,
       nickname: result.nickname,
+      serviceIntervalKm: result.serviceIntervalKm,
+      lastServiceMileage: result.lastServiceMileage,
+      lastServiceDate: result.lastServiceDate,
+      licenseExpiryDate: result.licenseExpiryDate,
     );
     if (mounted) {
       await context.read<AddExpenseCubit>().loadVehicles();
@@ -71,6 +75,10 @@ class _VehiclesPageState extends State<VehiclesPage> {
         purchasePrice: result.purchasePrice,
         initialMileage: result.initialMileage,
         nickname: result.nickname,
+        serviceIntervalKm: result.serviceIntervalKm,
+        lastServiceMileage: result.lastServiceMileage,
+        lastServiceDate: result.lastServiceDate,
+        licenseExpiryDate: result.licenseExpiryDate,
       ),
     );
     if (mounted) {

@@ -20,6 +20,10 @@ class IsarVehicleRepository implements VehicleRepository {
     required double purchasePrice,
     required int initialMileage,
     String? nickname,
+    int? serviceIntervalKm,
+    int? lastServiceMileage,
+    DateTime? lastServiceDate,
+    DateTime? licenseExpiryDate,
   }) async {
     final vehicle = VehicleIsar()
       ..make = make.trim()
@@ -29,7 +33,11 @@ class IsarVehicleRepository implements VehicleRepository {
       ..purchaseDate = purchaseDate
       ..purchasePrice = purchasePrice
       ..initialMileage = initialMileage
-      ..nickname = nickname?.trim();
+      ..nickname = nickname?.trim()
+      ..serviceIntervalKm = serviceIntervalKm
+      ..lastServiceMileage = lastServiceMileage
+      ..lastServiceDate = lastServiceDate
+      ..licenseExpiryDate = licenseExpiryDate;
 
     return _isar.writeTxn(() => _isar.vehicleIsars.put(vehicle));
   }
