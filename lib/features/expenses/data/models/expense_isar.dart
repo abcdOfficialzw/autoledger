@@ -37,3 +37,17 @@ extension ExpenseIsarMapper on ExpenseIsar {
     );
   }
 }
+
+extension ExpenseMapper on Expense {
+  ExpenseIsar toIsar() {
+    return ExpenseIsar()
+      ..id = id
+      ..vehicleId = vehicleId
+      ..date = date
+      ..amount = amount
+      ..category = category
+      ..odometer = odometer
+      ..vendor = vendor?.trim()
+      ..notes = notes?.trim();
+  }
+}

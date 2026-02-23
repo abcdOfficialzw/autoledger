@@ -15,26 +15,94 @@ class ReportsCubit extends Cubit<ReportsState> {
   final ExpenseRepository _expenseRepository;
 
   Future<void> load() async {
-    emit(state.copyWith(status: ReportsStatus.loading, errorMessage: null));
+    await _loadForRange(showLoading: true);
+  }
+
+  Future<void> setDateRange(ReportsDateRange range) async {
+    emit(
+      state.copyWith(
+        selectedRange: range,
+        errorMessage: null,
+        clearRangeStart: range == ReportsDateRange.allTime,
+        clearRangeEnd: range == ReportsDateRange.allTime,
+      ),
+    );
+
+    if (range == ReportsDateRange.custom &&
+        (state.customStart == null || state.customEnd == null)) {
+      return;
+    }
+
+    await _loadForRange(showLoading: true);
+  }
+
+  Future<void> setCustomRange(DateTime start, DateTime end) async {
+    final normalizedStart = DateTime(start.year, start.month, start.day);
+    final normalizedEnd = DateTime(
+      end.year,
+      end.month,
+      end.day,
+      23,
+      59,
+      59,
+      999,
+    );
+
+    emit(
+      state.copyWith(
+        selectedRange: ReportsDateRange.custom,
+        customStart: normalizedStart,
+        customEnd: normalizedEnd,
+        rangeStart: normalizedStart,
+        rangeEnd: normalizedEnd,
+        errorMessage: null,
+      ),
+    );
+
+    await _loadForRange(showLoading: true);
+  }
+
+  Future<void> _loadForRange({required bool showLoading}) async {
+    if (showLoading) {
+      emit(state.copyWith(status: ReportsStatus.loading, errorMessage: null));
+    }
+
     try {
       final vehicles = await _vehicleRepository.getVehicles();
+      final bounds = _resolveRangeBounds();
+
       final expensesByVehicle = await Future.wait(
         vehicles.map(
-          (vehicle) => _expenseRepository.getExpensesForVehicle(vehicle.id),
+          (vehicle) => _expenseRepository.getExpensesForVehicle(
+            vehicle.id,
+            startDate: bounds.start,
+            endDate: bounds.end,
+          ),
         ),
       );
 
       final categoryTotals = <ExpenseCategory, double>{};
+      final monthlyTotals = <DateTime, double>{};
       var totalExpenses = 0.0;
       var totalPurchase = 0.0;
 
       for (var index = 0; index < vehicles.length; index++) {
         final vehicle = vehicles[index];
+        final vehicleExpenses = expensesByVehicle[index];
+
         totalPurchase += vehicle.purchasePrice;
-        for (final expense in expensesByVehicle[index]) {
+
+        for (final expense in vehicleExpenses) {
           totalExpenses += expense.amount;
           categoryTotals.update(
             expense.category,
+            (value) => value + expense.amount,
+            ifAbsent: () => expense.amount,
+          );
+
+          final monthStart = DateTime(expense.date.year, expense.date.month);
+          monthlyTotals.update(
+            monthStart,
             (value) => value + expense.amount,
             ifAbsent: () => expense.amount,
           );
@@ -44,11 +112,25 @@ class ReportsCubit extends Cubit<ReportsState> {
       final categoryBreakdown =
           categoryTotals.entries
               .map(
-                (entry) =>
-                    CategorySpend(category: entry.key, total: entry.value),
+                (entry) => CategorySpend(
+                  category: entry.key,
+                  total: entry.value,
+                  percentage: totalExpenses <= 0
+                      ? 0
+                      : entry.value / totalExpenses,
+                ),
               )
               .toList(growable: false)
             ..sort((a, b) => b.total.compareTo(a.total));
+
+      final monthlyTrend =
+          monthlyTotals.entries
+              .map(
+                (entry) =>
+                    MonthlySpend(monthStart: entry.key, total: entry.value),
+              )
+              .toList(growable: false)
+            ..sort((a, b) => a.monthStart.compareTo(b.monthStart));
 
       final baseline = _buildCostPerKmBaseline(
         vehicles: vehicles,
@@ -58,10 +140,13 @@ class ReportsCubit extends Cubit<ReportsState> {
       emit(
         state.copyWith(
           status: ReportsStatus.success,
+          rangeStart: bounds.start,
+          rangeEnd: bounds.end,
           totalPurchase: totalPurchase,
           totalExpenses: totalExpenses,
           totalOwnershipCost: totalPurchase + totalExpenses,
           categoryBreakdown: categoryBreakdown,
+          monthlyTrend: monthlyTrend,
           baselineVehicleCount: baseline.vehicleCount,
           clearCostPerKmBaseline: baseline.costPerKm == null,
           costPerKmBaseline: baseline.costPerKm,
@@ -75,6 +160,34 @@ class ReportsCubit extends Cubit<ReportsState> {
           errorMessage: 'Failed to load reports.',
         ),
       );
+    }
+  }
+
+  _DateRangeBounds _resolveRangeBounds() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+
+    switch (state.selectedRange) {
+      case ReportsDateRange.last30Days:
+        return _DateRangeBounds(
+          start: today.subtract(const Duration(days: 29)),
+          end: endOfToday,
+        );
+      case ReportsDateRange.last90Days:
+        return _DateRangeBounds(
+          start: today.subtract(const Duration(days: 89)),
+          end: endOfToday,
+        );
+      case ReportsDateRange.last1Year:
+        return _DateRangeBounds(
+          start: DateTime(today.year - 1, today.month, today.day),
+          end: endOfToday,
+        );
+      case ReportsDateRange.allTime:
+        return const _DateRangeBounds(start: null, end: null);
+      case ReportsDateRange.custom:
+        return _DateRangeBounds(start: state.customStart, end: state.customEnd);
     }
   }
 
@@ -93,17 +206,29 @@ class ReportsCubit extends Cubit<ReportsState> {
         continue;
       }
 
-      final withOdometer = expenses.where(
-        (expense) => expense.odometer != null,
-      );
+      final withOdometer = expenses
+          .where((expense) => expense.odometer != null)
+          .toList();
       if (withOdometer.isEmpty) {
         continue;
       }
 
-      final latestOdometer = withOdometer
+      final odometerValues = withOdometer
           .map((expense) => expense.odometer!)
-          .reduce((value, element) => value > element ? value : element);
-      final travelled = latestOdometer - vehicle.initialMileage;
+          .toList();
+      final maxOdometer = odometerValues.reduce(
+        (value, element) => value > element ? value : element,
+      );
+      final minOdometer = odometerValues.reduce(
+        (value, element) => value < element ? value : element,
+      );
+
+      final travelledWithinPeriod = maxOdometer - minOdometer;
+      final travelledFromBaseline = maxOdometer - vehicle.initialMileage;
+      final travelled = travelledWithinPeriod > 0
+          ? travelledWithinPeriod
+          : travelledFromBaseline;
+
       if (travelled <= 0) {
         continue;
       }
@@ -135,4 +260,11 @@ class _CostPerKmBaseline {
 
   final double? costPerKm;
   final int vehicleCount;
+}
+
+class _DateRangeBounds {
+  const _DateRangeBounds({required this.start, required this.end});
+
+  final DateTime? start;
+  final DateTime? end;
 }

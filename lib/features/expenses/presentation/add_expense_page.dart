@@ -61,12 +61,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
     final odometer = odometerText.isEmpty ? null : int.parse(odometerText);
 
     await context.read<AddExpenseCubit>().submit(
-          date: _expenseDate,
-          amount: amount,
-          odometer: odometer,
-          vendor: _vendorController.text,
-          notes: _notesController.text,
-        );
+      date: _expenseDate,
+      amount: amount,
+      odometer: odometer,
+      vendor: _vendorController.text,
+      notes: _notesController.text,
+    );
   }
 
   void _resetForm() {
@@ -84,15 +84,16 @@ class _AddExpensePageState extends State<AddExpensePage> {
         if (state.status == AddExpenseStatus.success) {
           _resetForm();
           context.read<VehicleCubit>().loadVehicles();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Expense saved.')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Expense saved.')));
         }
 
-        if (state.status == AddExpenseStatus.failure && state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+        if (state.status == AddExpenseStatus.failure &&
+            state.errorMessage != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         }
       },
       builder: (context, state) {
@@ -101,7 +102,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                Text('Quick Add Expense', style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  'Quick Add Expense',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   'Log expenses in under 10 seconds.',
@@ -113,7 +117,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Center(child: CircularProgressIndicator()),
                   ),
-                if (state.vehicles.isEmpty && state.status != AddExpenseStatus.loading)
+                if (state.vehicles.isEmpty &&
+                    state.status != AddExpenseStatus.loading)
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -130,7 +135,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       children: [
                         DropdownButtonFormField<int>(
                           initialValue: state.selectedVehicleId,
-                          decoration: const InputDecoration(labelText: 'Vehicle'),
+                          decoration: const InputDecoration(
+                            labelText: 'Vehicle',
+                          ),
                           items: state.vehicles
                               .map(
                                 (vehicle) => DropdownMenuItem<int>(
@@ -141,15 +148,21 @@ class _AddExpensePageState extends State<AddExpensePage> {
                               .toList(growable: false),
                           onChanged: (value) {
                             if (value != null) {
-                              context.read<AddExpenseCubit>().setSelectedVehicle(value);
+                              context
+                                  .read<AddExpenseCubit>()
+                                  .setSelectedVehicle(value);
                             }
                           },
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _amountController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          decoration: const InputDecoration(labelText: 'Amount'),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Amount',
+                          ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Amount is required';
@@ -164,7 +177,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         const SizedBox(height: 12),
                         DropdownButtonFormField<ExpenseCategory>(
                           initialValue: state.selectedCategory,
-                          decoration: const InputDecoration(labelText: 'Category'),
+                          decoration: const InputDecoration(
+                            labelText: 'Category',
+                          ),
                           items: ExpenseCategory.values
                               .map(
                                 (category) => DropdownMenuItem<ExpenseCategory>(
@@ -175,7 +190,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                               .toList(growable: false),
                           onChanged: (value) {
                             if (value != null) {
-                              context.read<AddExpenseCubit>().setSelectedCategory(value);
+                              context
+                                  .read<AddExpenseCubit>()
+                                  .setSelectedCategory(value);
                             }
                           },
                         ),
@@ -183,11 +200,17 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         InkWell(
                           onTap: _pickDate,
                           child: InputDecorator(
-                            decoration: const InputDecoration(labelText: 'Date'),
+                            decoration: const InputDecoration(
+                              labelText: 'Date',
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(MaterialLocalizations.of(context).formatMediumDate(_expenseDate)),
+                                Text(
+                                  MaterialLocalizations.of(
+                                    context,
+                                  ).formatMediumDate(_expenseDate),
+                                ),
                                 const Icon(Icons.calendar_today_outlined),
                               ],
                             ),
@@ -197,7 +220,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         TextFormField(
                           controller: _odometerController,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Odometer (optional)'),
+                          decoration: const InputDecoration(
+                            labelText: 'Odometer (optional)',
+                          ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return null;
@@ -212,20 +237,25 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _vendorController,
-                          decoration: const InputDecoration(labelText: 'Vendor (optional)'),
+                          decoration: const InputDecoration(
+                            labelText: 'Vendor (optional)',
+                          ),
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _notesController,
                           minLines: 2,
                           maxLines: 4,
-                          decoration: const InputDecoration(labelText: 'Notes (optional)'),
+                          decoration: const InputDecoration(
+                            labelText: 'Notes (optional)',
+                          ),
                         ),
                         const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
                           child: FilledButton(
-                            onPressed: state.status == AddExpenseStatus.submitting
+                            onPressed:
+                                state.status == AddExpenseStatus.submitting
                                 ? null
                                 : _saveExpense,
                             child: Text(

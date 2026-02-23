@@ -4,43 +4,99 @@ import '../../../expenses/domain/expense_category.dart';
 
 enum ReportsStatus { initial, loading, success, failure }
 
+enum ReportsDateRange { last30Days, last90Days, last1Year, allTime, custom }
+
+extension ReportsDateRangeX on ReportsDateRange {
+  String get label {
+    switch (this) {
+      case ReportsDateRange.last30Days:
+        return '30d';
+      case ReportsDateRange.last90Days:
+        return '90d';
+      case ReportsDateRange.last1Year:
+        return '1y';
+      case ReportsDateRange.allTime:
+        return 'All';
+      case ReportsDateRange.custom:
+        return 'Custom';
+    }
+  }
+}
+
 class CategorySpend extends Equatable {
-  const CategorySpend({required this.category, required this.total});
+  const CategorySpend({
+    required this.category,
+    required this.total,
+    required this.percentage,
+  });
 
   final ExpenseCategory category;
   final double total;
+  final double percentage;
 
   @override
-  List<Object> get props => [category, total];
+  List<Object> get props => [category, total, percentage];
+}
+
+class MonthlySpend extends Equatable {
+  const MonthlySpend({required this.monthStart, required this.total});
+
+  final DateTime monthStart;
+  final double total;
+
+  @override
+  List<Object> get props => [monthStart, total];
 }
 
 class ReportsState extends Equatable {
   const ReportsState({
     this.status = ReportsStatus.initial,
+    this.selectedRange = ReportsDateRange.last30Days,
+    this.customStart,
+    this.customEnd,
+    this.rangeStart,
+    this.rangeEnd,
     this.totalPurchase = 0,
     this.totalExpenses = 0,
     this.totalOwnershipCost = 0,
     this.categoryBreakdown = const [],
+    this.monthlyTrend = const [],
     this.costPerKmBaseline,
     this.baselineVehicleCount = 0,
     this.errorMessage,
   });
 
   final ReportsStatus status;
+  final ReportsDateRange selectedRange;
+  final DateTime? customStart;
+  final DateTime? customEnd;
+  final DateTime? rangeStart;
+  final DateTime? rangeEnd;
   final double totalPurchase;
   final double totalExpenses;
   final double totalOwnershipCost;
   final List<CategorySpend> categoryBreakdown;
+  final List<MonthlySpend> monthlyTrend;
   final double? costPerKmBaseline;
   final int baselineVehicleCount;
   final String? errorMessage;
 
   ReportsState copyWith({
     ReportsStatus? status,
+    ReportsDateRange? selectedRange,
+    DateTime? customStart,
+    bool clearCustomStart = false,
+    DateTime? customEnd,
+    bool clearCustomEnd = false,
+    DateTime? rangeStart,
+    bool clearRangeStart = false,
+    DateTime? rangeEnd,
+    bool clearRangeEnd = false,
     double? totalPurchase,
     double? totalExpenses,
     double? totalOwnershipCost,
     List<CategorySpend>? categoryBreakdown,
+    List<MonthlySpend>? monthlyTrend,
     double? costPerKmBaseline,
     bool clearCostPerKmBaseline = false,
     int? baselineVehicleCount,
@@ -48,10 +104,16 @@ class ReportsState extends Equatable {
   }) {
     return ReportsState(
       status: status ?? this.status,
+      selectedRange: selectedRange ?? this.selectedRange,
+      customStart: clearCustomStart ? null : (customStart ?? this.customStart),
+      customEnd: clearCustomEnd ? null : (customEnd ?? this.customEnd),
+      rangeStart: clearRangeStart ? null : (rangeStart ?? this.rangeStart),
+      rangeEnd: clearRangeEnd ? null : (rangeEnd ?? this.rangeEnd),
       totalPurchase: totalPurchase ?? this.totalPurchase,
       totalExpenses: totalExpenses ?? this.totalExpenses,
       totalOwnershipCost: totalOwnershipCost ?? this.totalOwnershipCost,
       categoryBreakdown: categoryBreakdown ?? this.categoryBreakdown,
+      monthlyTrend: monthlyTrend ?? this.monthlyTrend,
       costPerKmBaseline: clearCostPerKmBaseline
           ? null
           : (costPerKmBaseline ?? this.costPerKmBaseline),
@@ -63,10 +125,16 @@ class ReportsState extends Equatable {
   @override
   List<Object?> get props => [
     status,
+    selectedRange,
+    customStart,
+    customEnd,
+    rangeStart,
+    rangeEnd,
     totalPurchase,
     totalExpenses,
     totalOwnershipCost,
     categoryBreakdown,
+    monthlyTrend,
     costPerKmBaseline,
     baselineVehicleCount,
     errorMessage,

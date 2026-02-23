@@ -43,10 +43,10 @@ class AddExpenseState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        vehicles,
-        selectedVehicleId,
-        selectedCategory,
-        errorMessage,
-      ];
+    status,
+    vehicles,
+    selectedVehicleId,
+    selectedCategory,
+    errorMessage,
+  ];
 }

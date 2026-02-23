@@ -25,10 +25,22 @@ class HomeShell extends StatelessWidget {
           bottomNavigationBar: NavigationBar(
             selectedIndex: index,
             destinations: const [
-              NavigationDestination(icon: Icon(Icons.directions_car), label: 'Vehicles'),
-              NavigationDestination(icon: Icon(Icons.add_circle_outline), label: 'Add Expense'),
-              NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Reports'),
-              NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+              NavigationDestination(
+                icon: Icon(Icons.directions_car),
+                label: 'Vehicles',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.add_circle_outline),
+                label: 'Add Expense',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.bar_chart),
+                label: 'Reports',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
             ],
             onDestinationSelected: (value) =>
                 context.read<NavigationCubit>().setIndex(value),

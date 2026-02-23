@@ -23,15 +23,40 @@ class Expense extends Equatable {
   final String? vendor;
   final String? notes;
 
+  Expense copyWith({
+    int? id,
+    int? vehicleId,
+    DateTime? date,
+    double? amount,
+    ExpenseCategory? category,
+    int? odometer,
+    bool clearOdometer = false,
+    String? vendor,
+    bool clearVendor = false,
+    String? notes,
+    bool clearNotes = false,
+  }) {
+    return Expense(
+      id: id ?? this.id,
+      vehicleId: vehicleId ?? this.vehicleId,
+      date: date ?? this.date,
+      amount: amount ?? this.amount,
+      category: category ?? this.category,
+      odometer: clearOdometer ? null : (odometer ?? this.odometer),
+      vendor: clearVendor ? null : (vendor ?? this.vendor),
+      notes: clearNotes ? null : (notes ?? this.notes),
+    );
+  }
+
   @override
   List<Object?> get props => [
-        id,
-        vehicleId,
-        date,
-        amount,
-        category,
-        odometer,
-        vendor,
-        notes,
-      ];
+    id,
+    vehicleId,
+    date,
+    amount,
+    category,
+    odometer,
+    vendor,
+    notes,
+  ];
 }

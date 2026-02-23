@@ -7,7 +7,7 @@ import 'add_expense_state.dart';
 
 class AddExpenseCubit extends Cubit<AddExpenseState> {
   AddExpenseCubit(this._expenseRepository, this._vehicleRepository)
-      : super(const AddExpenseState());
+    : super(const AddExpenseState());
 
   final ExpenseRepository _expenseRepository;
   final VehicleRepository _vehicleRepository;
@@ -63,7 +63,9 @@ class AddExpenseCubit extends Cubit<AddExpenseState> {
       return;
     }
 
-    emit(state.copyWith(status: AddExpenseStatus.submitting, errorMessage: null));
+    emit(
+      state.copyWith(status: AddExpenseStatus.submitting, errorMessage: null),
+    );
 
     try {
       await _expenseRepository.createExpense(

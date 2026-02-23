@@ -55,8 +55,12 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
     _nicknameController = TextEditingController(text: vehicle?.nickname ?? '');
     _makeController = TextEditingController(text: vehicle?.make ?? '');
     _modelController = TextEditingController(text: vehicle?.model ?? '');
-    _yearController = TextEditingController(text: vehicle?.year.toString() ?? '');
-    _regController = TextEditingController(text: vehicle?.registrationNumber ?? '');
+    _yearController = TextEditingController(
+      text: vehicle?.year.toString() ?? '',
+    );
+    _regController = TextEditingController(
+      text: vehicle?.registrationNumber ?? '',
+    );
     _purchasePriceController = TextEditingController(
       text: vehicle != null ? vehicle.purchasePrice.toStringAsFixed(2) : '',
     );
@@ -133,7 +137,9 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                 TextFormField(
                   controller: _nicknameController,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Nickname (optional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Nickname (optional)',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -160,7 +166,9 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                       return 'Year is required';
                     }
                     final parsed = int.tryParse(value.trim());
-                    if (parsed == null || parsed < 1900 || parsed > DateTime.now().year + 1) {
+                    if (parsed == null ||
+                        parsed < 1900 ||
+                        parsed > DateTime.now().year + 1) {
                       return 'Enter a valid year';
                     }
                     return null;
@@ -170,18 +178,26 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                 TextFormField(
                   controller: _regController,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Registration number'),
+                  decoration: const InputDecoration(
+                    labelText: 'Registration number',
+                  ),
                   validator: _requiredValidator,
                 ),
                 const SizedBox(height: 12),
                 InkWell(
                   onTap: _pickDate,
                   child: InputDecorator(
-                    decoration: const InputDecoration(labelText: 'Purchase date'),
+                    decoration: const InputDecoration(
+                      labelText: 'Purchase date',
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(MaterialLocalizations.of(context).formatMediumDate(_purchaseDate)),
+                        Text(
+                          MaterialLocalizations.of(
+                            context,
+                          ).formatMediumDate(_purchaseDate),
+                        ),
                         const Icon(Icons.calendar_today_outlined),
                       ],
                     ),
@@ -190,9 +206,13 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _purchasePriceController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Purchase price'),
+                  decoration: const InputDecoration(
+                    labelText: 'Purchase price',
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Purchase price is required';
@@ -209,7 +229,9 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                   controller: _initialMileageController,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.done,
-                  decoration: const InputDecoration(labelText: 'Initial mileage'),
+                  decoration: const InputDecoration(
+                    labelText: 'Initial mileage',
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Initial mileage is required';

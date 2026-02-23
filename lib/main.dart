@@ -6,7 +6,9 @@ import 'core/database/local_database.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/expenses/data/isar_expense_repository.dart';
+import 'features/expenses/data/services/local_csv_export_service.dart';
 import 'features/expenses/domain/expense_repository.dart';
+import 'features/expenses/domain/services/csv_export_service.dart';
 import 'features/expenses/presentation/cubit/add_expense_cubit.dart';
 import 'features/shell/presentation/navigation_cubit.dart';
 import 'features/vehicles/data/isar_vehicle_repository.dart';
@@ -26,9 +28,10 @@ class AutoLedgerApp extends StatelessWidget {
     this.expenseRepository,
     super.key,
   }) : assert(
-          isar != null || (vehicleRepository != null && expenseRepository != null),
-          'Provide either isar or explicit repositories.',
-        );
+         isar != null ||
+             (vehicleRepository != null && expenseRepository != null),
+         'Provide either isar or explicit repositories.',
+       );
 
   final Isar? isar;
   final VehicleRepository? vehicleRepository;
@@ -36,8 +39,14 @@ class AutoLedgerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedVehicleRepository = vehicleRepository ?? IsarVehicleRepository(isar!);
-    final resolvedExpenseRepository = expenseRepository ?? IsarExpenseRepository(isar!);
+    final resolvedVehicleRepository =
+        vehicleRepository ?? IsarVehicleRepository(isar!);
+    final resolvedExpenseRepository =
+        expenseRepository ?? IsarExpenseRepository(isar!);
+    final csvExportService = LocalCsvExportService(
+      resolvedExpenseRepository,
+      resolvedVehicleRepository,
+    );
 
     return MultiRepositoryProvider(
       providers: [
@@ -47,12 +56,14 @@ class AutoLedgerApp extends StatelessWidget {
         RepositoryProvider<ExpenseRepository>(
           create: (_) => resolvedExpenseRepository,
         ),
+        RepositoryProvider<CsvExportService>(create: (_) => csvExportService),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => NavigationCubit()),
           BlocProvider(
-            create: (context) => VehicleCubit(context.read<VehicleRepository>()),
+            create: (context) =>
+                VehicleCubit(context.read<VehicleRepository>()),
           ),
           BlocProvider(
             create: (context) => AddExpenseCubit(
