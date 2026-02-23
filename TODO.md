@@ -40,3 +40,4 @@
 - [x] Apply liquid-glass visual style to dashboard surfaces and key cards.
 - [x] Convert bottom navigation to floating Telegram-like style.
 - [ ] Validate UX changes with analyze/test and push to main.
+- [x] Dashboard quick overview layout: use horizontal wrap tiles to better utilize width.

@@ -234,36 +234,54 @@ class _MetricsPanel extends StatelessWidget {
         children: [
           Text('Quick overview', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _MetricTile(label: 'Vehicles', value: '$vehicleCount'),
-              _MetricTile(
-                label: 'Fleet value',
-                value: Formatters.currency(
-                  totalVehicleValue,
-                  currencyCode: currencyCode,
-                  currencySymbol: currencySymbol,
-                ),
-              ),
-              _MetricTile(
-                label: 'This month',
-                value: Formatters.currency(
-                  monthExpenses,
-                  currencyCode: currencyCode,
-                  currencySymbol: currencySymbol,
-                ),
-              ),
-              _MetricTile(
-                label: 'Lifetime spend',
-                value: Formatters.currency(
-                  totalExpenses,
-                  currencyCode: currencyCode,
-                  currencySymbol: currencySymbol,
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final maxWidth = constraints.maxWidth;
+              final tileWidth = maxWidth >= 720
+                  ? (maxWidth - 20) / 3
+                  : maxWidth >= 460
+                      ? (maxWidth - 10) / 2
+                      : maxWidth;
+
+              return Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  _MetricTile(
+                    width: tileWidth,
+                    label: 'Vehicles',
+                    value: '$vehicleCount',
+                  ),
+                  _MetricTile(
+                    width: tileWidth,
+                    label: 'Fleet value',
+                    value: Formatters.currency(
+                      totalVehicleValue,
+                      currencyCode: currencyCode,
+                      currencySymbol: currencySymbol,
+                    ),
+                  ),
+                  _MetricTile(
+                    width: tileWidth,
+                    label: 'This month',
+                    value: Formatters.currency(
+                      monthExpenses,
+                      currencyCode: currencyCode,
+                      currencySymbol: currencySymbol,
+                    ),
+                  ),
+                  _MetricTile(
+                    width: tileWidth,
+                    label: 'Lifetime spend',
+                    value: Formatters.currency(
+                      totalExpenses,
+                      currencyCode: currencyCode,
+                      currencySymbol: currencySymbol,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -272,14 +290,18 @@ class _MetricsPanel extends StatelessWidget {
 }
 
 class _MetricTile extends StatelessWidget {
-  const _MetricTile({required this.label, required this.value});
+  const _MetricTile({
+    required this.label,
+    required this.value,
+    required this.width,
+  });
 
   final String label;
   final String value;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
-    final width = (MediaQuery.sizeOf(context).width - 58) / 2;
     return SizedBox(
       width: width,
       child: DecoratedBox(
