@@ -50,3 +50,4 @@
 - [x] Bottom nav style update: match Telegram-like capsule with selected tab pill emphasis.
 - [x] Nav restructure: Home, Vehicles, Reports, Settings in capsule + detached Add button opening Add Expense page.
 - [x] Bottom nav visual tune: match provided mock spacing, pill proportions, and detached add button balance.
+- [x] Bottom nav compact mode: remove labels and reduce extra bottom spacing under nav.
