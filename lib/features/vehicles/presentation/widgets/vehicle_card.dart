@@ -90,14 +90,14 @@ class VehicleCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
+                  horizontal: 14,
+                  vertical: 10,
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 52,
-                      height: 52,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -125,7 +125,7 @@ class VehicleCard extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,42 +155,27 @@ class VehicleCard extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(height: 9),
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              final wide = constraints.maxWidth >= 330;
-                              final tileWidth = wide
-                                  ? (constraints.maxWidth - 8) / 2
-                                  : constraints.maxWidth;
-
-                              return Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  _InfoStatTile(
-                                    width: tileWidth,
-                                    icon: Icons.build_circle_outlined,
-                                    title: 'Next service',
-                                    value: nextServiceLabel,
-                                  ),
-                                  _InfoStatTile(
-                                    width: tileWidth,
-                                    icon: Icons.event_available_outlined,
-                                    title: 'License renewal',
-                                    value: licenseRenewalDate == null
-                                        ? 'Not set'
-                                        : Formatters.date(licenseRenewalDate),
-                                  ),
-                                  _InfoStatTile(
-                                    width: wide ? constraints.maxWidth : tileWidth,
-                                    icon: Icons.speed_outlined,
-                                    title: 'Accrued mileage',
-                                    value:
-                                        '${Formatters.number(distanceUnit.fromKilometers(accruedMileage))} ${distanceUnit.shortLabel}',
-                                  ),
-                                ],
-                              );
-                            },
+                          const SizedBox(height: 7),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              _InfoChipCompact(
+                                icon: Icons.build_circle_outlined,
+                                text: 'Service: $nextServiceLabel',
+                              ),
+                              _InfoChipCompact(
+                                icon: Icons.event_available_outlined,
+                                text: licenseRenewalDate == null
+                                    ? 'License: Not set'
+                                    : 'License: ${Formatters.date(licenseRenewalDate)}',
+                              ),
+                              _InfoChipCompact(
+                                icon: Icons.speed_outlined,
+                                text:
+                                    'Accrued: ${Formatters.number(distanceUnit.fromKilometers(accruedMileage))} ${distanceUnit.shortLabel}',
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -221,63 +206,37 @@ class VehicleCard extends StatelessWidget {
   }
 }
 
-class _InfoStatTile extends StatelessWidget {
-  const _InfoStatTile({
-    required this.width,
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+class _InfoChipCompact extends StatelessWidget {
+  const _InfoChipCompact({required this.icon, required this.text});
 
-  final double width;
   final IconData icon;
-  final String title;
-  final String value;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return SizedBox(
-      width: width,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.46),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          child: Row(
-            children: [
-              Icon(icon, size: 15, color: theme.colorScheme.primary),
-              const SizedBox(width: 7),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.68)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12.5, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 4),
+            Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -56,3 +56,4 @@
 - [x] Vehicle chip details: show next service date, license renewal date, and accrued mileage.
 - [x] Vehicle chip detail layout: redesign service/license/accrued mileage section into a cleaner premium stat arrangement.
 - [x] Vehicle chip service field: replace N/A with intelligent fallback (next due mileage when date is unavailable).
+- [x] Vehicle card compact pass: reduce chip/stat visual weight and overall card height for lighter overview.
