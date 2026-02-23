@@ -54,3 +54,4 @@
 - [x] Liquid redesign rollout: convert remaining app screens to modern liquid-glass UI system (expenses, reports, settings, detail pages, forms).
 - [x] Add Expense modernization: redesign with richer liquid UI, better hierarchy, and quick category selection.
 - [x] Vehicle chip details: show next service date, license renewal date, and accrued mileage.
+- [x] Vehicle chip detail layout: redesign service/license/accrued mileage section into a cleaner premium stat arrangement.

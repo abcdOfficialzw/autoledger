@@ -145,29 +145,44 @@ class VehicleCard extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              _InfoChip(
-                                icon: Icons.build_circle_outlined,
-                                label: nextServiceDate == null
-                                    ? 'Next service: N/A'
-                                    : 'Next service: ${Formatters.date(nextServiceDate)}',
-                              ),
-                              _InfoChip(
-                                icon: Icons.event_available_outlined,
-                                label: licenseRenewalDate == null
-                                    ? 'License renewal: N/A'
-                                    : 'License renewal: ${Formatters.date(licenseRenewalDate)}',
-                              ),
-                              _InfoChip(
-                                icon: Icons.speed_outlined,
-                                label:
-                                    'Accrued mileage: ${Formatters.number(distanceUnit.fromKilometers(accruedMileage))} ${distanceUnit.shortLabel}',
-                              ),
-                            ],
+                          const SizedBox(height: 9),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final wide = constraints.maxWidth >= 330;
+                              final tileWidth = wide
+                                  ? (constraints.maxWidth - 8) / 2
+                                  : constraints.maxWidth;
+
+                              return Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  _InfoStatTile(
+                                    width: tileWidth,
+                                    icon: Icons.build_circle_outlined,
+                                    title: 'Next service',
+                                    value: nextServiceDate == null
+                                        ? 'Not set'
+                                        : Formatters.date(nextServiceDate),
+                                  ),
+                                  _InfoStatTile(
+                                    width: tileWidth,
+                                    icon: Icons.event_available_outlined,
+                                    title: 'License renewal',
+                                    value: licenseRenewalDate == null
+                                        ? 'Not set'
+                                        : Formatters.date(licenseRenewalDate),
+                                  ),
+                                  _InfoStatTile(
+                                    width: wide ? constraints.maxWidth : tileWidth,
+                                    icon: Icons.speed_outlined,
+                                    title: 'Accrued mileage',
+                                    value:
+                                        '${Formatters.number(distanceUnit.fromKilometers(accruedMileage))} ${distanceUnit.shortLabel}',
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -198,29 +213,63 @@ class VehicleCard extends StatelessWidget {
   }
 }
 
-class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.icon, required this.label});
+class _InfoStatTile extends StatelessWidget {
+  const _InfoStatTile({
+    required this.width,
+    required this.icon,
+    required this.title,
+    required this.value,
+  });
 
+  final double width;
   final IconData icon;
-  final String label;
+  final String title;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 13),
-            const SizedBox(width: 4),
-            Text(label, style: Theme.of(context).textTheme.labelSmall),
-          ],
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      width: width,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.46),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          child: Row(
+            children: [
+              Icon(icon, size: 15, color: theme.colorScheme.primary),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
