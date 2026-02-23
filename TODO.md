@@ -35,3 +35,8 @@
 
 ## New Priority Requests
 - [x] Reports UI modernization: redesign with richer dashboard metrics and additional charts.
+- [ ] Dashboard-first navigation: add a new Dashboard as first tab with quick overview cards.
+- [ ] Dashboard actions: quick add expense, jump to vehicles, jump to reports.
+- [ ] Apply liquid-glass visual style to dashboard surfaces and key cards.
+- [ ] Convert bottom navigation to floating Telegram-like style.
+- [ ] Validate UX changes with analyze/test and push to main.
