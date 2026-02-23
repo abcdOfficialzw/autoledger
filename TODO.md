@@ -32,3 +32,6 @@
 - Midpoint: add a short status note with one concrete checkpoint completed and one next action.
 - Done: check off the task only after code, docs, and tests are complete; include evidence reference (script/command used).
 - Batch close: mark `All approved items implemented and checked off` only when every approved item in the batch is complete.
+
+## New Priority Requests
+- [x] Reports UI modernization: redesign with richer dashboard metrics and additional charts.
