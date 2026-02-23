@@ -26,7 +26,7 @@ class HomeShell extends StatelessWidget {
           extendBody: true,
           body: SafeArea(child: _pages[index]),
           bottomNavigationBar: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
             child: Row(
               children: [
                 Expanded(
@@ -62,10 +62,10 @@ class _FloatingNavBar extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   static const _items = [
-    (Icons.home_outlined, 'Home'),
-    (Icons.directions_car_outlined, 'Vehicles'),
-    (Icons.bar_chart_outlined, 'Reports'),
-    (Icons.settings_outlined, 'Settings'),
+    Icons.home_outlined,
+    Icons.directions_car_outlined,
+    Icons.bar_chart_outlined,
+    Icons.settings_outlined,
   ];
 
   @override
@@ -85,61 +85,38 @@ class _FloatingNavBar extends StatelessWidget {
           ),
         ],
       ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          child: Row(
-            children: List.generate(_items.length, (index) {
-              final item = _items[index];
-              final isSelected = selectedIndex == index;
-              return Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(22),
-                  onTap: () => onTap(index),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(22),
-                      color: isSelected
-                          ? const Color(0xFFE7E8ED)
-                          : Colors.transparent,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          item.$1,
-                          size: 21,
-                          color: isSelected
-                              ? colorScheme.primary
-                              : const Color(0xFF111111),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          item.$2,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(
-                                color: isSelected
-                                    ? colorScheme.primary
-                                    : const Color(0xFF111111),
-                                fontWeight: isSelected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                        ),
-                      ],
-                    ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          children: List.generate(_items.length, (index) {
+            final icon = _items[index];
+            final isSelected = selectedIndex == index;
+            return Expanded(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => onTap(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: isSelected
+                        ? const Color(0xFFE7E8ED)
+                        : Colors.transparent,
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 22,
+                    color: isSelected
+                        ? colorScheme.primary
+                        : const Color(0xFF111111),
                   ),
                 ),
-              );
-            }),
-          ),
+              ),
+            );
+          }),
         ),
       ),
     );

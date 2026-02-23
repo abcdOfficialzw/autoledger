@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:motoledger/features/expenses/domain/expense.dart';
 import 'package:motoledger/features/expenses/domain/expense_category.dart';
@@ -25,7 +26,7 @@ void main() {
     expect(find.text('Dashboard'), findsWidgets);
     expect(find.text('Go to vehicles'), findsOneWidget);
 
-    await tester.tap(find.text('Settings'));
+    await tester.tap(find.byIcon(Icons.settings_outlined));
     await tester.pumpAndSettle();
 
     expect(find.text('Currency'), findsOneWidget);
