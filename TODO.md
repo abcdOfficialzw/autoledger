@@ -43,3 +43,7 @@
 - [x] Dashboard quick overview layout: use horizontal wrap tiles to better utilize width.
 - [x] Dashboard quick overview layout: switch adaptive wrap to fixed responsive grid.
 - [x] Dashboard quick overview layout: force fixed 2-column grid (2x2 for current metrics).
+- [ ] Vehicles page UI modernization: apply liquid-glass styling and modern layout.
+- [ ] Vehicles page cards: add visual car icon/thumbnail treatment per vehicle.
+- [ ] Vehicles page UX: improve hierarchy/actions for quick scan and interactions.
+- [ ] Validate vehicles redesign with tests and push to main.
