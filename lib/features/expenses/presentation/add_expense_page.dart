@@ -129,7 +129,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     child: Column(
                       children: [
                         DropdownButtonFormField<int>(
-                          value: state.selectedVehicleId,
+                          initialValue: state.selectedVehicleId,
                           decoration: const InputDecoration(labelText: 'Vehicle'),
                           items: state.vehicles
                               .map(
@@ -163,7 +163,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<ExpenseCategory>(
-                          value: state.selectedCategory,
+                          initialValue: state.selectedCategory,
                           decoration: const InputDecoration(labelText: 'Category'),
                           items: ExpenseCategory.values
                               .map(

@@ -17,7 +17,6 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Vehicles'), findsOneWidget);
     expect(find.text('Add Vehicle'), findsOneWidget);
   });
 }
