@@ -3,10 +3,10 @@
 - [x] Fix analyzer lint warnings in settings page (`use_build_context_synchronously`) and push to main.
 
 ## Approved Next Batch
-- [ ] Add reminder action controls (Mark done / Snooze / Reschedule).
-- [ ] Persist reminder action state per vehicle/reminder type.
-- [ ] Show “next due” recalculation after reminder actions.
-- [ ] Add tests for reminder action flows.
+- [x] Add reminder action controls (Mark done / Snooze / Reschedule).
+- [x] Persist reminder action state per vehicle/reminder type.
+- [x] Show “next due” recalculation after reminder actions.
+- [x] Add tests for reminder action flows.
 - [ ] Add export/import entry points in Settings.
 - [ ] Add backup/restore guidance screen.
 - [ ] Add reset confirmation flow (safe + explicit).
@@ -23,6 +23,6 @@
 - [ ] Add CI-ready check script (`analyze + test`) for local consistency.
 - [ ] Add contribution notes for future iterations.
 - [ ] All approved items implemented and checked off.
-- [ ] `flutter analyze` passes.
-- [ ] `flutter test` passes.
-- [ ] Changes pushed to `main` with clean commit history.
+- [x] `flutter analyze` passes.
+- [x] `flutter test` passes.
+- [x] Changes pushed to `main` with clean commit history.
