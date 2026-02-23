@@ -228,65 +228,54 @@ class _MetricsPanel extends StatelessWidget {
       );
     }
 
+    final metrics = [
+      ('Vehicles', '$vehicleCount'),
+      (
+        'Fleet value',
+        Formatters.currency(
+          totalVehicleValue,
+          currencyCode: currencyCode,
+          currencySymbol: currencySymbol,
+        ),
+      ),
+      (
+        'This month',
+        Formatters.currency(
+          monthExpenses,
+          currencyCode: currencyCode,
+          currencySymbol: currencySymbol,
+        ),
+      ),
+      (
+        'Lifetime spend',
+        Formatters.currency(
+          totalExpenses,
+          currencyCode: currencyCode,
+          currencySymbol: currencySymbol,
+        ),
+      ),
+    ];
+
     return _GlassPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Quick overview', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final maxWidth = constraints.maxWidth;
-              final crossAxisCount = maxWidth >= 720
-                  ? 3
-                  : maxWidth >= 460
-                      ? 2
-                      : 1;
-
-              final metrics = [
-                ('Vehicles', '$vehicleCount'),
-                (
-                  'Fleet value',
-                  Formatters.currency(
-                    totalVehicleValue,
-                    currencyCode: currencyCode,
-                    currencySymbol: currencySymbol,
-                  ),
-                ),
-                (
-                  'This month',
-                  Formatters.currency(
-                    monthExpenses,
-                    currencyCode: currencyCode,
-                    currencySymbol: currencySymbol,
-                  ),
-                ),
-                (
-                  'Lifetime spend',
-                  Formatters.currency(
-                    totalExpenses,
-                    currencyCode: currencyCode,
-                    currencySymbol: currencySymbol,
-                  ),
-                ),
-              ];
-
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: metrics.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: crossAxisCount == 1 ? 3.4 : 2.2,
-                ),
-                itemBuilder: (context, index) => _MetricTile(
-                  label: metrics[index].$1,
-                  value: metrics[index].$2,
-                ),
-              );
-            },
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: metrics.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 2.2,
+            ),
+            itemBuilder: (context, index) => _MetricTile(
+              label: metrics[index].$1,
+              value: metrics[index].$2,
+            ),
           ),
         ],
       ),
