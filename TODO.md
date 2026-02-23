@@ -15,10 +15,10 @@
 - [x] Improve chart legends + empty/fallback states.
 - [x] Add summary chips (top cost category, monthly delta).
 - [x] Add tests for report filter and summary logic.
-- [ ] Finalize app branding assets (icon/splash/title).
-- [ ] Confirm package/app naming strategy (keep `motoledger` internally or rename).
-- [ ] Build Android release APK/AAB sanity check.
-- [ ] Add lightweight release checklist to README.
+- [x] Finalize app branding assets (icon/splash/title).
+- [x] Confirm package/app naming strategy (keep `motoledger` internally or rename).
+- [x] Build Android release APK/AAB sanity check.
+- [x] Add lightweight release checklist to README.
 - [ ] Expand TODO discipline (task start/midpoint/done cadence documented).
 - [ ] Add CI-ready check script (`analyze + test`) for local consistency.
 - [ ] Add contribution notes for future iterations.

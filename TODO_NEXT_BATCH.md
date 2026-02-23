@@ -24,10 +24,10 @@ Move from feature-complete MVP core to release-ready MVP with better usability a
 - [x] Add tests for report filter and summary logic.
 
 ## D) Release Readiness (Android-first)
-- [ ] Finalize app branding assets (icon/splash/title).
-- [ ] Confirm package/app naming strategy (keep `motoledger` internally or rename).
-- [ ] Build Android release APK/AAB sanity check.
-- [ ] Add lightweight release checklist to README.
+- [x] Finalize app branding assets (icon/splash/title).
+- [x] Confirm package/app naming strategy (keep `motoledger` internally or rename).
+- [x] Build Android release APK/AAB sanity check.
+- [x] Add lightweight release checklist to README.
 
 ## E) Dev Workflow Hardening
 - [ ] Expand TODO discipline (task start/midpoint/done cadence documented).
