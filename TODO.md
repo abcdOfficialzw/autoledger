@@ -47,3 +47,4 @@
 - [x] Vehicles page cards: add visual car icon/thumbnail treatment per vehicle.
 - [x] Vehicles page UX: improve hierarchy/actions for quick scan and interactions.
 - [x] Validate vehicles redesign with tests and push to main.
+- [x] Bottom nav style update: match Telegram-like capsule with selected tab pill emphasis.
