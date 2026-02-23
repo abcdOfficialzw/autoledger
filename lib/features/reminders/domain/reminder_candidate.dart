@@ -36,15 +36,22 @@ class ReminderCandidate extends Equatable {
 }
 
 class VehicleReminderSnapshot extends Equatable {
-  const VehicleReminderSnapshot({this.service, this.license});
+  const VehicleReminderSnapshot({
+    this.service,
+    this.license,
+    this.serviceNextDue,
+    this.licenseNextDue,
+  });
 
   final ReminderCandidate? service;
   final ReminderCandidate? license;
+  final ReminderCandidate? serviceNextDue;
+  final ReminderCandidate? licenseNextDue;
 
   bool get hasReminder => service != null || license != null;
 
   @override
-  List<Object?> get props => [service, license];
+  List<Object?> get props => [service, license, serviceNextDue, licenseNextDue];
 }
 
 class ReminderSummary extends Equatable {

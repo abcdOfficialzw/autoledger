@@ -17,6 +17,32 @@ class ReminderComputationService {
     required List<Expense> expenses,
     required AppPreferences preferences,
   }) {
+    final dueCandidate = serviceDueCandidate(
+      vehicle: vehicle,
+      expenses: expenses,
+      preferences: preferences,
+    );
+    if (dueCandidate == null) {
+      return null;
+    }
+
+    if (_isSnoozedUntil(vehicle.serviceReminderSnoozedUntil)) {
+      return null;
+    }
+
+    final remainingKm = dueCandidate.remainingDistanceKm ?? 0;
+    if (remainingKm > serviceDueSoonWindowKm) {
+      return null;
+    }
+
+    return dueCandidate;
+  }
+
+  ReminderCandidate? serviceDueCandidate({
+    required Vehicle vehicle,
+    required List<Expense> expenses,
+    required AppPreferences preferences,
+  }) {
     if (!preferences.serviceReminderEnabled) {
       return null;
     }
@@ -29,12 +55,10 @@ class ReminderComputationService {
     final currentMileage = _currentMileage(vehicle, expenses);
     final baselineMileage =
         vehicle.lastServiceMileage ?? vehicle.initialMileage;
-    final dueMileage = baselineMileage + intervalKm;
+    final dueMileage =
+        vehicle.serviceReminderRescheduledMileage ??
+        (baselineMileage + intervalKm);
     final remainingKm = dueMileage - currentMileage;
-
-    if (remainingKm > serviceDueSoonWindowKm) {
-      return null;
-    }
 
     return ReminderCandidate(
       vehicleId: vehicle.id,
@@ -44,7 +68,8 @@ class ReminderComputationService {
           : ReminderUrgency.upcoming,
       remainingDistanceKm: remainingKm,
       dueMileage: dueMileage,
-      dueDate: vehicle.lastServiceDate,
+      dueDate:
+          vehicle.serviceReminderRescheduledDate ?? vehicle.lastServiceDate,
     );
   }
 
@@ -52,27 +77,47 @@ class ReminderComputationService {
     required Vehicle vehicle,
     required AppPreferences preferences,
   }) {
+    final dueCandidate = licenseDueCandidate(
+      vehicle: vehicle,
+      preferences: preferences,
+    );
+    if (dueCandidate == null) {
+      return null;
+    }
+
+    if (_isSnoozedUntil(vehicle.licenseReminderSnoozedUntil)) {
+      return null;
+    }
+
+    final remainingDays = dueCandidate.remainingDays ?? 0;
+    if (remainingDays > licenseDueSoonWindowDays) {
+      return null;
+    }
+
+    return dueCandidate;
+  }
+
+  ReminderCandidate? licenseDueCandidate({
+    required Vehicle vehicle,
+    required AppPreferences preferences,
+  }) {
     if (!preferences.licenseReminderEnabled) {
       return null;
     }
 
-    final expiryDate = vehicle.licenseExpiryDate;
+    final expiryDate =
+        vehicle.licenseReminderRescheduledDate ?? vehicle.licenseExpiryDate;
     if (expiryDate == null) {
       return null;
     }
 
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final today = _today();
     final normalizedExpiry = DateTime(
       expiryDate.year,
       expiryDate.month,
       expiryDate.day,
     );
     final remainingDays = normalizedExpiry.difference(today).inDays;
-
-    if (remainingDays > licenseDueSoonWindowDays) {
-      return null;
-    }
 
     return ReminderCandidate(
       vehicleId: vehicle.id,
@@ -97,6 +142,15 @@ class ReminderComputationService {
         preferences: preferences,
       ),
       license: upcomingLicenseReminderCandidate(
+        vehicle: vehicle,
+        preferences: preferences,
+      ),
+      serviceNextDue: serviceDueCandidate(
+        vehicle: vehicle,
+        expenses: expenses,
+        preferences: preferences,
+      ),
+      licenseNextDue: licenseDueCandidate(
         vehicle: vehicle,
         preferences: preferences,
       ),
@@ -165,5 +219,22 @@ class ReminderComputationService {
     }
 
     return maxMileage;
+  }
+
+  bool _isSnoozedUntil(DateTime? snoozedUntil) {
+    if (snoozedUntil == null) {
+      return false;
+    }
+    final normalizedSnoozeDate = DateTime(
+      snoozedUntil.year,
+      snoozedUntil.month,
+      snoozedUntil.day,
+    );
+    return normalizedSnoozeDate.isAfter(_today());
+  }
+
+  DateTime _today() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
   }
 }

@@ -11,6 +11,7 @@ import '../../reminders/domain/services/reminder_computation_service.dart';
 import '../../settings/domain/app_preferences.dart';
 import '../../settings/presentation/cubit/settings_cubit.dart';
 import '../domain/vehicle.dart';
+import '../domain/vehicle_repository.dart';
 import 'cubit/vehicle_detail_cubit.dart';
 import 'cubit/vehicle_detail_state.dart';
 
@@ -22,9 +23,11 @@ class VehicleDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          VehicleDetailCubit(context.read<ExpenseRepository>())
-            ..loadExpenses(vehicle.id),
+      create: (context) => VehicleDetailCubit(
+        context.read<ExpenseRepository>(),
+        context.read<VehicleRepository>(),
+        vehicle,
+      )..loadExpenses(vehicle.id),
       child: _VehicleDetailView(vehicle: vehicle),
     );
   }
@@ -34,6 +37,104 @@ class _VehicleDetailView extends StatelessWidget {
   const _VehicleDetailView({required this.vehicle});
 
   final Vehicle vehicle;
+
+  int _toKilometers(double value, DistanceUnit distanceUnit) {
+    if (distanceUnit == DistanceUnit.km) {
+      return value.round();
+    }
+    return (value / 0.621371).round();
+  }
+
+  Future<void> _rescheduleReminder(
+    BuildContext context, {
+    required ReminderType type,
+    required DistanceUnit distanceUnit,
+    required VehicleReminderSnapshot snapshot,
+  }) async {
+    if (type == ReminderType.service) {
+      final formKey = GlobalKey<FormState>();
+      final initialDueMileage = snapshot.serviceNextDue?.dueMileage;
+      final initialValue = initialDueMileage == null
+          ? ''
+          : Formatters.number(distanceUnit.fromKilometers(initialDueMileage));
+      final controller = TextEditingController(text: initialValue);
+
+      final confirmed =
+          await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Reschedule service'),
+                content: Form(
+                  key: formKey,
+                  child: TextFormField(
+                    controller: controller,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      labelText:
+                          'Due mileage (${distanceUnit.shortLabel.toUpperCase()})',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Due mileage is required';
+                      }
+                      final parsed = double.tryParse(value.trim());
+                      if (parsed == null || parsed <= 0) {
+                        return 'Enter a valid mileage';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Cancel'),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      if (!formKey.currentState!.validate()) {
+                        return;
+                      }
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text('Save'),
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
+
+      if (!confirmed || !context.mounted) {
+        controller.dispose();
+        return;
+      }
+
+      final parsed = double.parse(controller.text.trim());
+      controller.dispose();
+      await context.read<VehicleDetailCubit>().rescheduleServiceReminder(
+        _toKilometers(parsed, distanceUnit),
+      );
+      return;
+    }
+
+    final initialDate =
+        snapshot.licenseNextDue?.dueDate ??
+        DateTime.now().add(const Duration(days: 30));
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(DateTime.now().year - 1),
+      lastDate: DateTime(DateTime.now().year + 5),
+    );
+    if (picked == null || !context.mounted) {
+      return;
+    }
+    await context.read<VehicleDetailCubit>().rescheduleLicenseReminder(picked);
+  }
 
   Future<void> _exportVehicleCsv(BuildContext context) async {
     try {
@@ -301,6 +402,13 @@ class _VehicleDetailView extends StatelessWidget {
               context,
             ).showSnackBar(SnackBar(content: Text(state.actionMessage!)));
           }
+
+          if (state.reminderActionMessage != null &&
+              state.reminderActionStatus != VehicleReminderActionStatus.idle) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.reminderActionMessage!)),
+            );
+          }
         },
         builder: (context, state) {
           final preferences = context.select(
@@ -310,7 +418,7 @@ class _VehicleDetailView extends StatelessWidget {
           final reminderSnapshot = context
               .read<ReminderComputationService>()
               .vehicleReminders(
-                vehicle: vehicle,
+                vehicle: state.vehicle,
                 expenses: state.expenses,
                 preferences: preferences,
               );
@@ -363,23 +471,23 @@ class _VehicleDetailView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          vehicle.displayName,
+                          state.vehicle.displayName,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${vehicle.make} ${vehicle.model} - ${vehicle.year}',
+                          '${state.vehicle.make} ${state.vehicle.model} - ${state.vehicle.year}',
                         ),
                         const SizedBox(height: 8),
-                        Text('Reg: ${vehicle.registrationNumber}'),
+                        Text('Reg: ${state.vehicle.registrationNumber}'),
                         Text(
-                          'Purchase: ${Formatters.currency(vehicle.purchasePrice, currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}',
+                          'Purchase: ${Formatters.currency(state.vehicle.purchasePrice, currencyCode: preferences.currencyCode, currencySymbol: preferences.currencySymbol)}',
                         ),
                         Text(
-                          'Purchased on ${Formatters.date(vehicle.purchaseDate)}',
+                          'Purchased on ${Formatters.date(state.vehicle.purchaseDate)}',
                         ),
                         Text(
-                          'Initial mileage: ${Formatters.number(distanceUnit.fromKilometers(vehicle.initialMileage))} ${distanceUnit.shortLabel}',
+                          'Initial mileage: ${Formatters.number(distanceUnit.fromKilometers(state.vehicle.initialMileage))} ${distanceUnit.shortLabel}',
                         ),
                       ],
                     ),
@@ -389,6 +497,19 @@ class _VehicleDetailView extends StatelessWidget {
                 _ReminderStatusCard(
                   snapshot: reminderSnapshot,
                   distanceUnit: distanceUnit,
+                  onMarkDone: (type) =>
+                      context.read<VehicleDetailCubit>().markReminderDone(type),
+                  onSnooze: (type) =>
+                      context.read<VehicleDetailCubit>().snoozeReminder(type),
+                  onReschedule: (type) => _rescheduleReminder(
+                    context,
+                    type: type,
+                    distanceUnit: distanceUnit,
+                    snapshot: reminderSnapshot,
+                  ),
+                  isProcessing:
+                      state.reminderActionStatus ==
+                      VehicleReminderActionStatus.processing,
                 ),
                 const SizedBox(height: 8),
                 Card(
@@ -501,13 +622,24 @@ class _ReminderStatusCard extends StatelessWidget {
   const _ReminderStatusCard({
     required this.snapshot,
     required this.distanceUnit,
+    required this.onMarkDone,
+    required this.onSnooze,
+    required this.onReschedule,
+    required this.isProcessing,
   });
 
   final VehicleReminderSnapshot snapshot;
   final DistanceUnit distanceUnit;
+  final ValueChanged<ReminderType> onMarkDone;
+  final ValueChanged<ReminderType> onSnooze;
+  final ValueChanged<ReminderType> onReschedule;
+  final bool isProcessing;
 
   @override
   Widget build(BuildContext context) {
+    final serviceDue = snapshot.service ?? snapshot.serviceNextDue;
+    final licenseDue = snapshot.license ?? snapshot.licenseNextDue;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -516,18 +648,50 @@ class _ReminderStatusCard extends StatelessWidget {
           children: [
             Text('Reminders', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            Text(_serviceLabel(snapshot.service)),
-            const SizedBox(height: 4),
-            Text(_licenseLabel(snapshot.license)),
+            if (isProcessing) ...[
+              const LinearProgressIndicator(),
+              const SizedBox(height: 8),
+            ],
+            _ReminderActionRow(
+              title: _serviceLabel(
+                serviceDue,
+                isInWindow: snapshot.service != null,
+              ),
+              onMarkDone: serviceDue == null
+                  ? null
+                  : () => onMarkDone(ReminderType.service),
+              onSnooze: serviceDue == null
+                  ? null
+                  : () => onSnooze(ReminderType.service),
+              onReschedule: serviceDue == null
+                  ? null
+                  : () => onReschedule(ReminderType.service),
+            ),
+            const SizedBox(height: 8),
+            _ReminderActionRow(
+              title: _licenseLabel(
+                licenseDue,
+                isInWindow: snapshot.license != null,
+              ),
+              onMarkDone: licenseDue == null
+                  ? null
+                  : () => onMarkDone(ReminderType.license),
+              onSnooze: licenseDue == null
+                  ? null
+                  : () => onSnooze(ReminderType.license),
+              onReschedule: licenseDue == null
+                  ? null
+                  : () => onReschedule(ReminderType.license),
+            ),
           ],
         ),
       ),
     );
   }
 
-  String _serviceLabel(ReminderCandidate? service) {
+  String _serviceLabel(ReminderCandidate? service, {required bool isInWindow}) {
     if (service == null) {
-      return 'Service: no upcoming reminder.';
+      return 'Service: no schedule set.';
     }
 
     final remaining = service.remainingDistanceKm ?? 0;
@@ -537,7 +701,9 @@ class _ReminderStatusCard extends StatelessWidget {
         : distanceUnit.fromKilometers(service.dueMileage!);
     final status = service.urgency == ReminderUrgency.overdue
         ? 'overdue by'
-        : 'due in';
+        : isInWindow
+        ? 'due in'
+        : 'next due in';
     final dueMileageText = dueMileage == null
         ? ''
         : ' (target ${Formatters.number(dueMileage)} ${distanceUnit.shortLabel})';
@@ -545,19 +711,61 @@ class _ReminderStatusCard extends StatelessWidget {
     return 'Service: $status ${Formatters.number(remainingInUnit)} ${distanceUnit.shortLabel}$dueMileageText';
   }
 
-  String _licenseLabel(ReminderCandidate? license) {
+  String _licenseLabel(ReminderCandidate? license, {required bool isInWindow}) {
     if (license == null) {
-      return 'License: no upcoming reminder.';
+      return 'License: no schedule set.';
     }
 
     final remaining = (license.remainingDays ?? 0).abs();
     final status = license.urgency == ReminderUrgency.overdue
         ? 'expired'
-        : 'expires in';
+        : isInWindow
+        ? 'expires in'
+        : 'next renewal in';
     final dueDateText = license.dueDate == null
         ? ''
         : ' (${Formatters.date(license.dueDate!)})';
 
     return 'License: $status $remaining day(s)$dueDateText';
+  }
+}
+
+class _ReminderActionRow extends StatelessWidget {
+  const _ReminderActionRow({
+    required this.title,
+    required this.onMarkDone,
+    required this.onSnooze,
+    required this.onReschedule,
+  });
+
+  final String title;
+  final VoidCallback? onMarkDone;
+  final VoidCallback? onSnooze;
+  final VoidCallback? onReschedule;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title),
+        const SizedBox(height: 4),
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          children: [
+            OutlinedButton(
+              onPressed: onMarkDone,
+              child: const Text('Mark done'),
+            ),
+            OutlinedButton(onPressed: onSnooze, child: const Text('Snooze')),
+            OutlinedButton(
+              onPressed: onReschedule,
+              child: const Text('Reschedule'),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

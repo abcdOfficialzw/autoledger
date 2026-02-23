@@ -79,6 +79,14 @@ class _VehiclesPageState extends State<VehiclesPage> {
         lastServiceMileage: result.lastServiceMileage,
         lastServiceDate: result.lastServiceDate,
         licenseExpiryDate: result.licenseExpiryDate,
+        serviceReminderSnoozedUntil: vehicle.serviceReminderSnoozedUntil,
+        serviceReminderRescheduledMileage:
+            vehicle.serviceReminderRescheduledMileage,
+        serviceReminderRescheduledDate: vehicle.serviceReminderRescheduledDate,
+        serviceReminderLastDoneAt: vehicle.serviceReminderLastDoneAt,
+        licenseReminderSnoozedUntil: vehicle.licenseReminderSnoozedUntil,
+        licenseReminderRescheduledDate: vehicle.licenseReminderRescheduledDate,
+        licenseReminderLastDoneAt: vehicle.licenseReminderLastDoneAt,
       ),
     );
     if (mounted) {

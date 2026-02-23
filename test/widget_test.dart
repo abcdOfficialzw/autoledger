@@ -47,6 +47,13 @@ class _FakeVehicleRepository implements VehicleRepository {
     int? lastServiceMileage,
     DateTime? lastServiceDate,
     DateTime? licenseExpiryDate,
+    DateTime? serviceReminderSnoozedUntil,
+    int? serviceReminderRescheduledMileage,
+    DateTime? serviceReminderRescheduledDate,
+    DateTime? serviceReminderLastDoneAt,
+    DateTime? licenseReminderSnoozedUntil,
+    DateTime? licenseReminderRescheduledDate,
+    DateTime? licenseReminderLastDoneAt,
   }) async {
     final id = _vehicles.length + 1;
     _vehicles.add(
@@ -64,6 +71,13 @@ class _FakeVehicleRepository implements VehicleRepository {
         lastServiceMileage: lastServiceMileage,
         lastServiceDate: lastServiceDate,
         licenseExpiryDate: licenseExpiryDate,
+        serviceReminderSnoozedUntil: serviceReminderSnoozedUntil,
+        serviceReminderRescheduledMileage: serviceReminderRescheduledMileage,
+        serviceReminderRescheduledDate: serviceReminderRescheduledDate,
+        serviceReminderLastDoneAt: serviceReminderLastDoneAt,
+        licenseReminderSnoozedUntil: licenseReminderSnoozedUntil,
+        licenseReminderRescheduledDate: licenseReminderRescheduledDate,
+        licenseReminderLastDoneAt: licenseReminderLastDoneAt,
       ),
     );
     return id;

@@ -43,6 +43,13 @@ class VehicleCubit extends Cubit<VehicleState> {
     int? lastServiceMileage,
     DateTime? lastServiceDate,
     DateTime? licenseExpiryDate,
+    DateTime? serviceReminderSnoozedUntil,
+    int? serviceReminderRescheduledMileage,
+    DateTime? serviceReminderRescheduledDate,
+    DateTime? serviceReminderLastDoneAt,
+    DateTime? licenseReminderSnoozedUntil,
+    DateTime? licenseReminderRescheduledDate,
+    DateTime? licenseReminderLastDoneAt,
   }) async {
     try {
       await _vehicleRepository.createVehicle(
@@ -58,6 +65,13 @@ class VehicleCubit extends Cubit<VehicleState> {
         lastServiceMileage: lastServiceMileage,
         lastServiceDate: lastServiceDate,
         licenseExpiryDate: licenseExpiryDate,
+        serviceReminderSnoozedUntil: serviceReminderSnoozedUntil,
+        serviceReminderRescheduledMileage: serviceReminderRescheduledMileage,
+        serviceReminderRescheduledDate: serviceReminderRescheduledDate,
+        serviceReminderLastDoneAt: serviceReminderLastDoneAt,
+        licenseReminderSnoozedUntil: licenseReminderSnoozedUntil,
+        licenseReminderRescheduledDate: licenseReminderRescheduledDate,
+        licenseReminderLastDoneAt: licenseReminderLastDoneAt,
       );
       await loadVehicles();
     } catch (_) {

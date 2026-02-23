@@ -16,6 +16,13 @@ abstract class VehicleRepository {
     int? lastServiceMileage,
     DateTime? lastServiceDate,
     DateTime? licenseExpiryDate,
+    DateTime? serviceReminderSnoozedUntil,
+    int? serviceReminderRescheduledMileage,
+    DateTime? serviceReminderRescheduledDate,
+    DateTime? serviceReminderLastDoneAt,
+    DateTime? licenseReminderSnoozedUntil,
+    DateTime? licenseReminderRescheduledDate,
+    DateTime? licenseReminderLastDoneAt,
   });
 
   Future<void> updateVehicle(Vehicle vehicle);

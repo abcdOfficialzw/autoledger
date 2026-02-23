@@ -23,6 +23,13 @@ class VehicleIsar {
   int? lastServiceMileage;
   DateTime? lastServiceDate;
   DateTime? licenseExpiryDate;
+  DateTime? serviceReminderSnoozedUntil;
+  int? serviceReminderRescheduledMileage;
+  DateTime? serviceReminderRescheduledDate;
+  DateTime? serviceReminderLastDoneAt;
+  DateTime? licenseReminderSnoozedUntil;
+  DateTime? licenseReminderRescheduledDate;
+  DateTime? licenseReminderLastDoneAt;
 }
 
 extension VehicleIsarMapper on VehicleIsar {
@@ -41,6 +48,13 @@ extension VehicleIsarMapper on VehicleIsar {
       lastServiceMileage: lastServiceMileage,
       lastServiceDate: lastServiceDate,
       licenseExpiryDate: licenseExpiryDate,
+      serviceReminderSnoozedUntil: serviceReminderSnoozedUntil,
+      serviceReminderRescheduledMileage: serviceReminderRescheduledMileage,
+      serviceReminderRescheduledDate: serviceReminderRescheduledDate,
+      serviceReminderLastDoneAt: serviceReminderLastDoneAt,
+      licenseReminderSnoozedUntil: licenseReminderSnoozedUntil,
+      licenseReminderRescheduledDate: licenseReminderRescheduledDate,
+      licenseReminderLastDoneAt: licenseReminderLastDoneAt,
     );
   }
 }
@@ -60,6 +74,13 @@ extension VehicleMapper on Vehicle {
       ..serviceIntervalKm = serviceIntervalKm
       ..lastServiceMileage = lastServiceMileage
       ..lastServiceDate = lastServiceDate
-      ..licenseExpiryDate = licenseExpiryDate;
+      ..licenseExpiryDate = licenseExpiryDate
+      ..serviceReminderSnoozedUntil = serviceReminderSnoozedUntil
+      ..serviceReminderRescheduledMileage = serviceReminderRescheduledMileage
+      ..serviceReminderRescheduledDate = serviceReminderRescheduledDate
+      ..serviceReminderLastDoneAt = serviceReminderLastDoneAt
+      ..licenseReminderSnoozedUntil = licenseReminderSnoozedUntil
+      ..licenseReminderRescheduledDate = licenseReminderRescheduledDate
+      ..licenseReminderLastDoneAt = licenseReminderLastDoneAt;
   }
 }

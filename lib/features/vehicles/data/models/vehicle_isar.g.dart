@@ -37,43 +37,78 @@ const VehicleIsarSchema = CollectionSchema(
       name: r'licenseExpiryDate',
       type: IsarType.dateTime,
     ),
-    r'make': PropertySchema(
+    r'licenseReminderLastDoneAt': PropertySchema(
       id: 4,
+      name: r'licenseReminderLastDoneAt',
+      type: IsarType.dateTime,
+    ),
+    r'licenseReminderRescheduledDate': PropertySchema(
+      id: 5,
+      name: r'licenseReminderRescheduledDate',
+      type: IsarType.dateTime,
+    ),
+    r'licenseReminderSnoozedUntil': PropertySchema(
+      id: 6,
+      name: r'licenseReminderSnoozedUntil',
+      type: IsarType.dateTime,
+    ),
+    r'make': PropertySchema(
+      id: 7,
       name: r'make',
       type: IsarType.string,
     ),
     r'model': PropertySchema(
-      id: 5,
+      id: 8,
       name: r'model',
       type: IsarType.string,
     ),
     r'nickname': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'nickname',
       type: IsarType.string,
     ),
     r'purchaseDate': PropertySchema(
-      id: 7,
+      id: 10,
       name: r'purchaseDate',
       type: IsarType.dateTime,
     ),
     r'purchasePrice': PropertySchema(
-      id: 8,
+      id: 11,
       name: r'purchasePrice',
       type: IsarType.double,
     ),
     r'registrationNumber': PropertySchema(
-      id: 9,
+      id: 12,
       name: r'registrationNumber',
       type: IsarType.string,
     ),
     r'serviceIntervalKm': PropertySchema(
-      id: 10,
+      id: 13,
       name: r'serviceIntervalKm',
       type: IsarType.long,
     ),
+    r'serviceReminderLastDoneAt': PropertySchema(
+      id: 14,
+      name: r'serviceReminderLastDoneAt',
+      type: IsarType.dateTime,
+    ),
+    r'serviceReminderRescheduledDate': PropertySchema(
+      id: 15,
+      name: r'serviceReminderRescheduledDate',
+      type: IsarType.dateTime,
+    ),
+    r'serviceReminderRescheduledMileage': PropertySchema(
+      id: 16,
+      name: r'serviceReminderRescheduledMileage',
+      type: IsarType.long,
+    ),
+    r'serviceReminderSnoozedUntil': PropertySchema(
+      id: 17,
+      name: r'serviceReminderSnoozedUntil',
+      type: IsarType.dateTime,
+    ),
     r'year': PropertySchema(
-      id: 11,
+      id: 18,
       name: r'year',
       type: IsarType.long,
     )
@@ -134,14 +169,21 @@ void _vehicleIsarSerialize(
   writer.writeDateTime(offsets[1], object.lastServiceDate);
   writer.writeLong(offsets[2], object.lastServiceMileage);
   writer.writeDateTime(offsets[3], object.licenseExpiryDate);
-  writer.writeString(offsets[4], object.make);
-  writer.writeString(offsets[5], object.model);
-  writer.writeString(offsets[6], object.nickname);
-  writer.writeDateTime(offsets[7], object.purchaseDate);
-  writer.writeDouble(offsets[8], object.purchasePrice);
-  writer.writeString(offsets[9], object.registrationNumber);
-  writer.writeLong(offsets[10], object.serviceIntervalKm);
-  writer.writeLong(offsets[11], object.year);
+  writer.writeDateTime(offsets[4], object.licenseReminderLastDoneAt);
+  writer.writeDateTime(offsets[5], object.licenseReminderRescheduledDate);
+  writer.writeDateTime(offsets[6], object.licenseReminderSnoozedUntil);
+  writer.writeString(offsets[7], object.make);
+  writer.writeString(offsets[8], object.model);
+  writer.writeString(offsets[9], object.nickname);
+  writer.writeDateTime(offsets[10], object.purchaseDate);
+  writer.writeDouble(offsets[11], object.purchasePrice);
+  writer.writeString(offsets[12], object.registrationNumber);
+  writer.writeLong(offsets[13], object.serviceIntervalKm);
+  writer.writeDateTime(offsets[14], object.serviceReminderLastDoneAt);
+  writer.writeDateTime(offsets[15], object.serviceReminderRescheduledDate);
+  writer.writeLong(offsets[16], object.serviceReminderRescheduledMileage);
+  writer.writeDateTime(offsets[17], object.serviceReminderSnoozedUntil);
+  writer.writeLong(offsets[18], object.year);
 }
 
 VehicleIsar _vehicleIsarDeserialize(
@@ -156,14 +198,22 @@ VehicleIsar _vehicleIsarDeserialize(
   object.lastServiceDate = reader.readDateTimeOrNull(offsets[1]);
   object.lastServiceMileage = reader.readLongOrNull(offsets[2]);
   object.licenseExpiryDate = reader.readDateTimeOrNull(offsets[3]);
-  object.make = reader.readString(offsets[4]);
-  object.model = reader.readString(offsets[5]);
-  object.nickname = reader.readStringOrNull(offsets[6]);
-  object.purchaseDate = reader.readDateTime(offsets[7]);
-  object.purchasePrice = reader.readDouble(offsets[8]);
-  object.registrationNumber = reader.readString(offsets[9]);
-  object.serviceIntervalKm = reader.readLongOrNull(offsets[10]);
-  object.year = reader.readLong(offsets[11]);
+  object.licenseReminderLastDoneAt = reader.readDateTimeOrNull(offsets[4]);
+  object.licenseReminderRescheduledDate = reader.readDateTimeOrNull(offsets[5]);
+  object.licenseReminderSnoozedUntil = reader.readDateTimeOrNull(offsets[6]);
+  object.make = reader.readString(offsets[7]);
+  object.model = reader.readString(offsets[8]);
+  object.nickname = reader.readStringOrNull(offsets[9]);
+  object.purchaseDate = reader.readDateTime(offsets[10]);
+  object.purchasePrice = reader.readDouble(offsets[11]);
+  object.registrationNumber = reader.readString(offsets[12]);
+  object.serviceIntervalKm = reader.readLongOrNull(offsets[13]);
+  object.serviceReminderLastDoneAt = reader.readDateTimeOrNull(offsets[14]);
+  object.serviceReminderRescheduledDate =
+      reader.readDateTimeOrNull(offsets[15]);
+  object.serviceReminderRescheduledMileage = reader.readLongOrNull(offsets[16]);
+  object.serviceReminderSnoozedUntil = reader.readDateTimeOrNull(offsets[17]);
+  object.year = reader.readLong(offsets[18]);
   return object;
 }
 
@@ -183,20 +233,34 @@ P _vehicleIsarDeserializeProp<P>(
     case 3:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 6:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 7:
-      return (reader.readDateTime(offset)) as P;
-    case 8:
-      return (reader.readDouble(offset)) as P;
-    case 9:
       return (reader.readString(offset)) as P;
+    case 8:
+      return (reader.readString(offset)) as P;
+    case 9:
+      return (reader.readStringOrNull(offset)) as P;
     case 10:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 11:
+      return (reader.readDouble(offset)) as P;
+    case 12:
+      return (reader.readString(offset)) as P;
+    case 13:
+      return (reader.readLongOrNull(offset)) as P;
+    case 14:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 15:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 16:
+      return (reader.readLongOrNull(offset)) as P;
+    case 17:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 18:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -723,6 +787,228 @@ extension VehicleIsarQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'licenseExpiryDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderLastDoneAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'licenseReminderLastDoneAt',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderLastDoneAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'licenseReminderLastDoneAt',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderLastDoneAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'licenseReminderLastDoneAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderLastDoneAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'licenseReminderLastDoneAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderLastDoneAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'licenseReminderLastDoneAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderLastDoneAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'licenseReminderLastDoneAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderRescheduledDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'licenseReminderRescheduledDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderRescheduledDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'licenseReminderRescheduledDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderRescheduledDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'licenseReminderRescheduledDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderRescheduledDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'licenseReminderRescheduledDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderRescheduledDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'licenseReminderRescheduledDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderRescheduledDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'licenseReminderRescheduledDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderSnoozedUntilIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'licenseReminderSnoozedUntil',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderSnoozedUntilIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'licenseReminderSnoozedUntil',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderSnoozedUntilEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'licenseReminderSnoozedUntil',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderSnoozedUntilGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'licenseReminderSnoozedUntil',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderSnoozedUntilLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'licenseReminderSnoozedUntil',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      licenseReminderSnoozedUntilBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'licenseReminderSnoozedUntil',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -1479,6 +1765,302 @@ extension VehicleIsarQueryFilter
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderLastDoneAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'serviceReminderLastDoneAt',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderLastDoneAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'serviceReminderLastDoneAt',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderLastDoneAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serviceReminderLastDoneAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderLastDoneAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serviceReminderLastDoneAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderLastDoneAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serviceReminderLastDoneAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderLastDoneAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serviceReminderLastDoneAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'serviceReminderRescheduledDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'serviceReminderRescheduledDate',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serviceReminderRescheduledDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serviceReminderRescheduledDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serviceReminderRescheduledDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serviceReminderRescheduledDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledMileageIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'serviceReminderRescheduledMileage',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledMileageIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'serviceReminderRescheduledMileage',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledMileageEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serviceReminderRescheduledMileage',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledMileageGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serviceReminderRescheduledMileage',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledMileageLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serviceReminderRescheduledMileage',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderRescheduledMileageBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serviceReminderRescheduledMileage',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderSnoozedUntilIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'serviceReminderSnoozedUntil',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderSnoozedUntilIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'serviceReminderSnoozedUntil',
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderSnoozedUntilEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serviceReminderSnoozedUntil',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderSnoozedUntilGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serviceReminderSnoozedUntil',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderSnoozedUntilLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serviceReminderSnoozedUntil',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition>
+      serviceReminderSnoozedUntilBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serviceReminderSnoozedUntil',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QAfterFilterCondition> yearEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
@@ -1595,6 +2177,48 @@ extension VehicleIsarQuerySortBy
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseReminderLastDoneAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderLastDoneAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseReminderLastDoneAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderLastDoneAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseReminderRescheduledDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderRescheduledDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseReminderRescheduledDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderRescheduledDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseReminderSnoozedUntil() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderSnoozedUntil', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByLicenseReminderSnoozedUntilDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderSnoozedUntil', Sort.desc);
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy> sortByMake() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'make', Sort.asc);
@@ -1685,6 +2309,62 @@ extension VehicleIsarQuerySortBy
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderLastDoneAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderLastDoneAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderLastDoneAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderLastDoneAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderRescheduledDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderRescheduledDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderRescheduledMileage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledMileage', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderRescheduledMileageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledMileage', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderSnoozedUntil() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderSnoozedUntil', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      sortByServiceReminderSnoozedUntilDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderSnoozedUntil', Sort.desc);
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy> sortByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'year', Sort.asc);
@@ -1763,6 +2443,48 @@ extension VehicleIsarQuerySortThenBy
       thenByLicenseExpiryDateDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'licenseExpiryDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseReminderLastDoneAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderLastDoneAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseReminderLastDoneAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderLastDoneAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseReminderRescheduledDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderRescheduledDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseReminderRescheduledDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderRescheduledDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseReminderSnoozedUntil() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderSnoozedUntil', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByLicenseReminderSnoozedUntilDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'licenseReminderSnoozedUntil', Sort.desc);
     });
   }
 
@@ -1856,6 +2578,62 @@ extension VehicleIsarQuerySortThenBy
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderLastDoneAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderLastDoneAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderLastDoneAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderLastDoneAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderRescheduledDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderRescheduledDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderRescheduledMileage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledMileage', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderRescheduledMileageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderRescheduledMileage', Sort.desc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderSnoozedUntil() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderSnoozedUntil', Sort.asc);
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy>
+      thenByServiceReminderSnoozedUntilDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceReminderSnoozedUntil', Sort.desc);
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QAfterSortBy> thenByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'year', Sort.asc);
@@ -1895,6 +2673,27 @@ extension VehicleIsarQueryWhereDistinct
       distinctByLicenseExpiryDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'licenseExpiryDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByLicenseReminderLastDoneAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'licenseReminderLastDoneAt');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByLicenseReminderRescheduledDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'licenseReminderRescheduledDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByLicenseReminderSnoozedUntil() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'licenseReminderSnoozedUntil');
     });
   }
 
@@ -1946,6 +2745,34 @@ extension VehicleIsarQueryWhereDistinct
     });
   }
 
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByServiceReminderLastDoneAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serviceReminderLastDoneAt');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByServiceReminderRescheduledDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serviceReminderRescheduledDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByServiceReminderRescheduledMileage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serviceReminderRescheduledMileage');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, VehicleIsar, QDistinct>
+      distinctByServiceReminderSnoozedUntil() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serviceReminderSnoozedUntil');
+    });
+  }
+
   QueryBuilder<VehicleIsar, VehicleIsar, QDistinct> distinctByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'year');
@@ -1985,6 +2812,27 @@ extension VehicleIsarQueryProperty
       licenseExpiryDateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'licenseExpiryDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      licenseReminderLastDoneAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'licenseReminderLastDoneAt');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      licenseReminderRescheduledDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'licenseReminderRescheduledDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      licenseReminderSnoozedUntilProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'licenseReminderSnoozedUntil');
     });
   }
 
@@ -2029,6 +2877,34 @@ extension VehicleIsarQueryProperty
       serviceIntervalKmProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'serviceIntervalKm');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      serviceReminderLastDoneAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serviceReminderLastDoneAt');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      serviceReminderRescheduledDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serviceReminderRescheduledDate');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, int?, QQueryOperations>
+      serviceReminderRescheduledMileageProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serviceReminderRescheduledMileage');
+    });
+  }
+
+  QueryBuilder<VehicleIsar, DateTime?, QQueryOperations>
+      serviceReminderSnoozedUntilProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serviceReminderSnoozedUntil');
     });
   }
 

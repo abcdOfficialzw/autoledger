@@ -15,6 +15,13 @@ class Vehicle extends Equatable {
     this.lastServiceMileage,
     this.lastServiceDate,
     this.licenseExpiryDate,
+    this.serviceReminderSnoozedUntil,
+    this.serviceReminderRescheduledMileage,
+    this.serviceReminderRescheduledDate,
+    this.serviceReminderLastDoneAt,
+    this.licenseReminderSnoozedUntil,
+    this.licenseReminderRescheduledDate,
+    this.licenseReminderLastDoneAt,
   });
 
   final int id;
@@ -30,6 +37,13 @@ class Vehicle extends Equatable {
   final int? lastServiceMileage;
   final DateTime? lastServiceDate;
   final DateTime? licenseExpiryDate;
+  final DateTime? serviceReminderSnoozedUntil;
+  final int? serviceReminderRescheduledMileage;
+  final DateTime? serviceReminderRescheduledDate;
+  final DateTime? serviceReminderLastDoneAt;
+  final DateTime? licenseReminderSnoozedUntil;
+  final DateTime? licenseReminderRescheduledDate;
+  final DateTime? licenseReminderLastDoneAt;
 
   String get displayName {
     final nick = nickname?.trim();
@@ -37,6 +51,88 @@ class Vehicle extends Equatable {
       return nick;
     }
     return '$make $model';
+  }
+
+  Vehicle copyWith({
+    String? make,
+    String? model,
+    int? year,
+    String? registrationNumber,
+    DateTime? purchaseDate,
+    double? purchasePrice,
+    int? initialMileage,
+    String? nickname,
+    bool clearNickname = false,
+    int? serviceIntervalKm,
+    bool clearServiceIntervalKm = false,
+    int? lastServiceMileage,
+    bool clearLastServiceMileage = false,
+    DateTime? lastServiceDate,
+    bool clearLastServiceDate = false,
+    DateTime? licenseExpiryDate,
+    bool clearLicenseExpiryDate = false,
+    DateTime? serviceReminderSnoozedUntil,
+    bool clearServiceReminderSnoozedUntil = false,
+    int? serviceReminderRescheduledMileage,
+    bool clearServiceReminderRescheduledMileage = false,
+    DateTime? serviceReminderRescheduledDate,
+    bool clearServiceReminderRescheduledDate = false,
+    DateTime? serviceReminderLastDoneAt,
+    bool clearServiceReminderLastDoneAt = false,
+    DateTime? licenseReminderSnoozedUntil,
+    bool clearLicenseReminderSnoozedUntil = false,
+    DateTime? licenseReminderRescheduledDate,
+    bool clearLicenseReminderRescheduledDate = false,
+    DateTime? licenseReminderLastDoneAt,
+    bool clearLicenseReminderLastDoneAt = false,
+  }) {
+    return Vehicle(
+      id: id,
+      make: make ?? this.make,
+      model: model ?? this.model,
+      year: year ?? this.year,
+      registrationNumber: registrationNumber ?? this.registrationNumber,
+      purchaseDate: purchaseDate ?? this.purchaseDate,
+      purchasePrice: purchasePrice ?? this.purchasePrice,
+      initialMileage: initialMileage ?? this.initialMileage,
+      nickname: clearNickname ? null : (nickname ?? this.nickname),
+      serviceIntervalKm: clearServiceIntervalKm
+          ? null
+          : (serviceIntervalKm ?? this.serviceIntervalKm),
+      lastServiceMileage: clearLastServiceMileage
+          ? null
+          : (lastServiceMileage ?? this.lastServiceMileage),
+      lastServiceDate: clearLastServiceDate
+          ? null
+          : (lastServiceDate ?? this.lastServiceDate),
+      licenseExpiryDate: clearLicenseExpiryDate
+          ? null
+          : (licenseExpiryDate ?? this.licenseExpiryDate),
+      serviceReminderSnoozedUntil: clearServiceReminderSnoozedUntil
+          ? null
+          : (serviceReminderSnoozedUntil ?? this.serviceReminderSnoozedUntil),
+      serviceReminderRescheduledMileage: clearServiceReminderRescheduledMileage
+          ? null
+          : (serviceReminderRescheduledMileage ??
+                this.serviceReminderRescheduledMileage),
+      serviceReminderRescheduledDate: clearServiceReminderRescheduledDate
+          ? null
+          : (serviceReminderRescheduledDate ??
+                this.serviceReminderRescheduledDate),
+      serviceReminderLastDoneAt: clearServiceReminderLastDoneAt
+          ? null
+          : (serviceReminderLastDoneAt ?? this.serviceReminderLastDoneAt),
+      licenseReminderSnoozedUntil: clearLicenseReminderSnoozedUntil
+          ? null
+          : (licenseReminderSnoozedUntil ?? this.licenseReminderSnoozedUntil),
+      licenseReminderRescheduledDate: clearLicenseReminderRescheduledDate
+          ? null
+          : (licenseReminderRescheduledDate ??
+                this.licenseReminderRescheduledDate),
+      licenseReminderLastDoneAt: clearLicenseReminderLastDoneAt
+          ? null
+          : (licenseReminderLastDoneAt ?? this.licenseReminderLastDoneAt),
+    );
   }
 
   @override
@@ -54,5 +150,12 @@ class Vehicle extends Equatable {
     lastServiceMileage,
     lastServiceDate,
     licenseExpiryDate,
+    serviceReminderSnoozedUntil,
+    serviceReminderRescheduledMileage,
+    serviceReminderRescheduledDate,
+    serviceReminderLastDoneAt,
+    licenseReminderSnoozedUntil,
+    licenseReminderRescheduledDate,
+    licenseReminderLastDoneAt,
   ];
 }

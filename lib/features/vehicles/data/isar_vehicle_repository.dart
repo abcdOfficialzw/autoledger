@@ -24,6 +24,13 @@ class IsarVehicleRepository implements VehicleRepository {
     int? lastServiceMileage,
     DateTime? lastServiceDate,
     DateTime? licenseExpiryDate,
+    DateTime? serviceReminderSnoozedUntil,
+    int? serviceReminderRescheduledMileage,
+    DateTime? serviceReminderRescheduledDate,
+    DateTime? serviceReminderLastDoneAt,
+    DateTime? licenseReminderSnoozedUntil,
+    DateTime? licenseReminderRescheduledDate,
+    DateTime? licenseReminderLastDoneAt,
   }) async {
     final vehicle = VehicleIsar()
       ..make = make.trim()
@@ -37,7 +44,14 @@ class IsarVehicleRepository implements VehicleRepository {
       ..serviceIntervalKm = serviceIntervalKm
       ..lastServiceMileage = lastServiceMileage
       ..lastServiceDate = lastServiceDate
-      ..licenseExpiryDate = licenseExpiryDate;
+      ..licenseExpiryDate = licenseExpiryDate
+      ..serviceReminderSnoozedUntil = serviceReminderSnoozedUntil
+      ..serviceReminderRescheduledMileage = serviceReminderRescheduledMileage
+      ..serviceReminderRescheduledDate = serviceReminderRescheduledDate
+      ..serviceReminderLastDoneAt = serviceReminderLastDoneAt
+      ..licenseReminderSnoozedUntil = licenseReminderSnoozedUntil
+      ..licenseReminderRescheduledDate = licenseReminderRescheduledDate
+      ..licenseReminderLastDoneAt = licenseReminderLastDoneAt;
 
     return _isar.writeTxn(() => _isar.vehicleIsars.put(vehicle));
   }

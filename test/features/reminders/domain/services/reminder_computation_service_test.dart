@@ -18,6 +18,11 @@ void main() {
     int? serviceIntervalKm,
     int? lastServiceMileage,
     DateTime? licenseExpiryDate,
+    DateTime? serviceReminderSnoozedUntil,
+    int? serviceReminderRescheduledMileage,
+    DateTime? serviceReminderRescheduledDate,
+    DateTime? licenseReminderSnoozedUntil,
+    DateTime? licenseReminderRescheduledDate,
   }) {
     return Vehicle(
       id: id,
@@ -31,6 +36,11 @@ void main() {
       serviceIntervalKm: serviceIntervalKm,
       lastServiceMileage: lastServiceMileage,
       licenseExpiryDate: licenseExpiryDate,
+      serviceReminderSnoozedUntil: serviceReminderSnoozedUntil,
+      serviceReminderRescheduledMileage: serviceReminderRescheduledMileage,
+      serviceReminderRescheduledDate: serviceReminderRescheduledDate,
+      licenseReminderSnoozedUntil: licenseReminderSnoozedUntil,
+      licenseReminderRescheduledDate: licenseReminderRescheduledDate,
     );
   }
 
@@ -170,5 +180,78 @@ void main() {
     expect(summary.serviceOverdue, 1);
     expect(summary.licenseUpcoming, 1);
     expect(summary.licenseOverdue, 1);
+  });
+
+  group('reminder action flows', () {
+    test('snooze suppresses service reminder while keeping next due', () {
+      final vehicle = buildVehicle(
+        serviceIntervalKm: 5000,
+        lastServiceMileage: 20000,
+        serviceReminderSnoozedUntil: DateTime.now().add(
+          const Duration(days: 2),
+        ),
+      );
+
+      final snapshot = service.vehicleReminders(
+        vehicle: vehicle,
+        expenses: [buildExpense(odometer: 24800)],
+        preferences: const AppPreferences(serviceReminderEnabled: true),
+      );
+
+      expect(snapshot.service, isNull);
+      expect(snapshot.serviceNextDue, isNotNull);
+      expect(snapshot.serviceNextDue!.remainingDistanceKm, 200);
+    });
+
+    test('reschedule overrides due target for service and license', () {
+      final licenseDate = DateTime.now().add(const Duration(days: 45));
+      final vehicle = buildVehicle(
+        serviceIntervalKm: 5000,
+        lastServiceMileage: 20000,
+        licenseExpiryDate: DateTime.now().add(const Duration(days: 10)),
+        serviceReminderRescheduledMileage: 25500,
+        serviceReminderRescheduledDate: DateTime.now(),
+        licenseReminderRescheduledDate: licenseDate,
+      );
+
+      final snapshot = service.vehicleReminders(
+        vehicle: vehicle,
+        expenses: [buildExpense(odometer: 25200)],
+        preferences: const AppPreferences(),
+      );
+
+      expect(snapshot.serviceNextDue, isNotNull);
+      expect(snapshot.serviceNextDue!.dueMileage, 25500);
+      expect(snapshot.serviceNextDue!.remainingDistanceKm, 300);
+      expect(snapshot.service, isNotNull);
+
+      expect(snapshot.licenseNextDue, isNotNull);
+      expect(
+        snapshot.licenseNextDue!.dueDate,
+        DateTime(licenseDate.year, licenseDate.month, licenseDate.day),
+      );
+      expect(snapshot.license, isNull);
+    });
+
+    test('mark done recalculates next due from updated baseline', () {
+      final vehicle = buildVehicle(
+        serviceIntervalKm: 5000,
+        lastServiceMileage: 25200,
+        licenseExpiryDate: DateTime.now().add(const Duration(days: 365)),
+      );
+
+      final snapshot = service.vehicleReminders(
+        vehicle: vehicle,
+        expenses: [buildExpense(odometer: 25200)],
+        preferences: const AppPreferences(),
+      );
+
+      expect(snapshot.service, isNull);
+      expect(snapshot.serviceNextDue, isNotNull);
+      expect(snapshot.serviceNextDue!.dueMileage, 30200);
+      expect(snapshot.serviceNextDue!.remainingDistanceKm, 5000);
+      expect(snapshot.license, isNull);
+      expect(snapshot.licenseNextDue, isNotNull);
+    });
   });
 }
