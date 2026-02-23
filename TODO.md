@@ -7,10 +7,10 @@
 - [x] Persist reminder action state per vehicle/reminder type.
 - [x] Show “next due” recalculation after reminder actions.
 - [x] Add tests for reminder action flows.
-- [ ] Add export/import entry points in Settings.
-- [ ] Add backup/restore guidance screen.
-- [ ] Add reset confirmation flow (safe + explicit).
-- [ ] Add tests for settings action triggers.
+- [x] Add export/import entry points in Settings.
+- [x] Add backup/restore guidance screen.
+- [x] Add reset confirmation flow (safe + explicit).
+- [x] Add tests for settings action triggers.
 - [ ] Add custom date range picker UX in Reports.
 - [ ] Improve chart legends + empty/fallback states.
 - [ ] Add summary chips (top cost category, monthly delta).
